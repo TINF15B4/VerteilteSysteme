@@ -12,11 +12,11 @@
         <properties>
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
-            <property name="hibernate.connection.url" value="jdbc:h2:file:~/quizduell_db"/>
-            <property name="hibernate.connection.username" value="sa"/>
-            <property name="hibernate.connection.password" value="sa"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://verteilte-systeme.ciyakbclx2wy.us-east-2.rds.amazonaws.com:3306/quizduell"/>
+            <property name="hibernate.connection.username" value="master_verteilt"/>
+            <property name="hibernate.connection.password" value="quizduellstinkthart"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDB53Dialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
