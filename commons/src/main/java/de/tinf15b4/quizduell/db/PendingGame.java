@@ -2,10 +2,19 @@ package de.tinf15b4.quizduell.db;
 
 import java.util.UUID;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class PendingGame {
 
+	@Id
 	private UUID gameId;
 
+	@ManyToOne
+	@JoinColumn(name = "user_id")
 	private User waitingUser;
 
 	public PendingGame(User waitingUser) {

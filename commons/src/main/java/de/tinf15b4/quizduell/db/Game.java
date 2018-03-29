@@ -6,14 +6,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Game {
 
+	@Id
 	private UUID gameId;
 
+	@OneToMany
 	private Set<User> users;
 
+	@OneToMany
 	private List<Question> questions;
 
+	@Column
 	private int points;
 
 	public Game(UUID gameId, Set<User> users, List<Question> questions) {

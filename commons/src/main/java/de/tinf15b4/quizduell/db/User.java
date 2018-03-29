@@ -1,9 +1,18 @@
 package de.tinf15b4.quizduell.db;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class User {
 
+	@Id
+	@GeneratedValue
 	private long id;
 
+	@Column
 	private String username;
 
 	public long getId() {

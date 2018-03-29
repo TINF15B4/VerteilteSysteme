@@ -2,14 +2,29 @@ package de.tinf15b4.quizduell.db;
 
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+@Entity
 public class Question {
 
+	@Id
+	@GeneratedValue
 	private long id;
 
+	@Column
 	private String questionString;
 
+	@OneToMany
 	private Set<Answer> answers;
 
+	@ManyToOne
+	@JoinColumn(name = "answer_id")
 	private Answer correctAnswer;
 
 	public String getQuestionString() {
