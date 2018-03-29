@@ -8,9 +8,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import de.tinf15b4.quizduell.rest.api.Answer;
+import de.tinf15b4.quizduell.db.Answer;
+import de.tinf15b4.quizduell.db.Question;
 import de.tinf15b4.quizduell.rest.api.IQuizduellService;
-import de.tinf15b4.quizduell.rest.api.Question;
 
 @Path("/api")
 public class QuizduellService implements IQuizduellService {
