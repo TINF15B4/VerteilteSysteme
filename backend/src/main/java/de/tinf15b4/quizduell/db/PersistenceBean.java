@@ -16,12 +16,12 @@ public class PersistenceBean {
 	public PersistenceBean() {
 		factory = Persistence.createEntityManagerFactory("production");
 	}
-
-	public List<User> getUsers() {
+	
+	public <T> List<T> findAll(Class<T> clazz) {
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		TypedQuery<User> query = manager.createQuery("SELECT u from User u", User.class);
-		List<User> list = query.getResultList();
+		TypedQuery<T> query = manager.createQuery("SELECT x from " + clazz.getName() +" x", clazz);
+		List<T> list = query.getResultList();
 		manager.getTransaction().commit();
 		return list;
 	}

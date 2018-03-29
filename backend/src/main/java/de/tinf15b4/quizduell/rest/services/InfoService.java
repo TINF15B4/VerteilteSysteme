@@ -31,7 +31,7 @@ public class InfoService {
 
 		response.append("Hello World!");
 
-		List<User> list = bean.getUsers();
+		List<User> list = bean.findAll(User.class);
 		String string = list.stream()//
 				.map(User::getUsername)//
 				.collect(Collectors.joining(", "));
