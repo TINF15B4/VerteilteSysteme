@@ -5,10 +5,23 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.util.HashMap;
+
 public class OpenBtdRequests {
     public static HttpResponse<JsonNode> receiveToken() throws UnirestException {
         return Unirest.get("https://opentdb.com/api_token.php")
                 .queryString("command", "request")
+                .asJson();
+    }
+
+    public static HttpResponse<JsonNode> retrieveQuestions(final int number, final String token) throws UnirestException {
+        return Unirest.get("https://opentdb.com/api.php")
+                .queryString(new HashMap<String, Object>(){
+                    {
+                        put("amount", number);
+                        put("token", token);
+                    }
+                })
                 .asJson();
     }
 }
