@@ -7,15 +7,23 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import de.tinf15b4.quizduell.opentbd.model.OpenBtdResults;
 import de.tinf15b4.quizduell.opentbd.model.Question;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
 
 public class OpenBtdBrowser {
 
+    private final IOpenBtdRequests btdRequests;
     private String Token;
 
+    public OpenBtdBrowser(IOpenBtdRequests requests) throws UnirestException {
+        btdRequests = requests;
+        Token = requestToken();
+    }
+
     private String requestToken() throws UnirestException {
-        HttpResponse<JsonNode> tokenHttpResponse = OpenBtdRequests.receiveToken();
+        HttpResponse<JsonNode> tokenHttpResponse = btdRequests.receiveToken();
 
         Gson gson = new Gson();
         Map tokenResponse = gson.fromJson(tokenHttpResponse.getBody().toString(), Map.class);
@@ -28,23 +36,17 @@ public class OpenBtdBrowser {
         }
     }
 
-    public List<Question> requestQuestions(int number) throws UnirestException {
+    public List<Question> requestQuestions(int number) throws UnirestException, UnsupportedEncodingException {
         return requestQuestions(null, number);
     }
 
-    public List<Question> requestQuestions(String token, int number) throws UnirestException {
+    public List<Question> requestQuestions(String token, int number) throws UnirestException, UnsupportedEncodingException {
         if(token == null) token = this.Token;
-        HttpResponse<JsonNode> questionsHttpResponse = OpenBtdRequests.retrieveQuestions(number, token);
+        HttpResponse<JsonNode> questionsHttpResponse = btdRequests.retrieveQuestions(number, token);
 
         Gson gson = new Gson();
         OpenBtdResults questionsResponse = gson.fromJson(questionsHttpResponse.getBody().toString(), OpenBtdResults.class);
         return (List<Question>) questionsResponse.getResults();
-    }
-
-    public static OpenBtdBrowser withToken() throws UnirestException {
-        OpenBtdBrowser openBtdBrowser = new OpenBtdBrowser();
-        openBtdBrowser.Token = openBtdBrowser.requestToken();
-        return openBtdBrowser;
     }
 
     public String getToken() {
