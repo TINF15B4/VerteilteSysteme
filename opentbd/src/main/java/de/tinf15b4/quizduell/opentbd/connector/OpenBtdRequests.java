@@ -21,6 +21,7 @@ public class OpenBtdRequests implements IOpenBtdRequests {
                         put("amount", number);
                         put("token", token);
                         put("encode", "url3986");
+                        put("type", "multiple");
                     }
                 })
                 .asJson();
