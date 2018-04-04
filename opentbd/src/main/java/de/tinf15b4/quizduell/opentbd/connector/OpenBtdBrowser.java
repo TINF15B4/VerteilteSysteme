@@ -9,6 +9,7 @@ import de.tinf15b4.quizduell.opentbd.model.Question;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +24,10 @@ public class OpenBtdBrowser {
     }
 
     private String requestToken() throws UnirestException {
-        HttpResponse<JsonNode> tokenHttpResponse = btdRequests.receiveToken();
+        String tokenJsonResponse = btdRequests.receiveToken();
 
         Gson gson = new Gson();
-        Map tokenResponse = gson.fromJson(tokenHttpResponse.getBody().toString(), Map.class);
+        Map tokenResponse = gson.fromJson(tokenJsonResponse, Map.class);
 
         if((Double)(tokenResponse.get("response_code")) == 0){
             return tokenResponse.get("token").toString();
@@ -42,11 +43,19 @@ public class OpenBtdBrowser {
 
     public List<Question> requestQuestions(String token, int number) throws UnirestException, UnsupportedEncodingException {
         if(token == null) token = this.Token;
-        HttpResponse<JsonNode> questionsHttpResponse = btdRequests.retrieveQuestions(number, token);
 
-        Gson gson = new Gson();
-        OpenBtdResults questionsResponse = gson.fromJson(questionsHttpResponse.getBody().toString(), OpenBtdResults.class);
-        return (List<Question>) questionsResponse.getResults();
+        List<Question> questions = new ArrayList<Question>(number);
+        do {
+            String questionsJsonResponse = btdRequests.retrieveQuestions(number > 50? 50 : number , token);
+
+            Gson gson = new Gson();
+            OpenBtdResults questionsResponse = gson.fromJson(questionsJsonResponse, OpenBtdResults.class);
+            questions.addAll(questionsResponse.getResults());
+
+            number -= 50;
+        } while(number > 50);
+
+        return questions;
     }
 
     public String getToken() {
