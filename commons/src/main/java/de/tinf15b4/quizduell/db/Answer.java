@@ -7,6 +7,8 @@ import javax.persistence.Id;
 
 @Entity
 public class Answer {
+	public Answer() {
+	}
 
 	@Id
 	@GeneratedValue
@@ -14,6 +16,10 @@ public class Answer {
 
 	@Column
 	private String answerString;
+
+	public Answer(String answerString) {
+		this.answerString = answerString;
+	}
 
 	public long getId() {
 		return id;
