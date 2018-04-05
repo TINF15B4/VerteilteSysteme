@@ -11,7 +11,7 @@ public interface IQuizduellService {
 
 	boolean postAnswer(Answer answer, UUID gameId, long userId);
 
-	UUID ready();
+	UUID ready(long userid);
 
 	int getPoints(UUID gameId, long userId);
 }

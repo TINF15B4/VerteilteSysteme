@@ -1,6 +1,8 @@
 package de.tinf15b4.quizduell.rest.services;
 
 import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -10,16 +12,20 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.tinf15b4.quizduell.db.Answer;
 import de.tinf15b4.quizduell.db.Game;
+import de.tinf15b4.quizduell.db.PendingGame;
 import de.tinf15b4.quizduell.db.PersistenceBean;
 import de.tinf15b4.quizduell.db.PlayingUser;
 import de.tinf15b4.quizduell.db.Question;
+import de.tinf15b4.quizduell.db.User;
 import de.tinf15b4.quizduell.rest.api.IQuizduellService;
 
 @Path("/api")
@@ -78,10 +84,32 @@ public class QuizduellService implements IQuizduellService {
 
 	@Override
 	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/ready")
-	public UUID ready() {
-		// TODO
-		return UUID.randomUUID(); // gameId
+	public UUID ready(long userid) {
+		User u = persistenceBean.findById(User.class, userid);
+		if (u == null)
+			throw new WebApplicationException(Response.status(400).entity("Unknown user\n").build());
+
+		PendingGame pg = persistenceBean.findAndConsumePendingGame(u);
+		if (pg != null) {
+			// create game
+			Set<PlayingUser> users = new HashSet<>();
+			users.add(new PlayingUser(u, 0));
+			users.add(new PlayingUser(pg.getWaitingUser(), 0));
+			// TODO: add questions
+			Game g = new Game(pg.getGameId(), users, null);
+
+			persistenceBean.merge(g);
+			return g.getGameId();
+		} else {
+			// create new pending game
+
+			pg = new PendingGame(u);
+			persistenceBean.merge(pg);
+
+			return pg.getGameId();
+		}
 	}
 
 	@Override
