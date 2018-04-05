@@ -28,6 +28,10 @@ public class NameGenerator {
         return this.markovName(MINLENGTH, MAXLENGTH, CHAINLENGTH);
     }
 
+    public String getNameWithNumbers(){
+        return String.format("%s%05d", this.getName(), new Random().nextInt(100000));
+    }
+
     public NameGenerator() {
         this.generateMap(CHAINLENGTH);
     }
