@@ -14,13 +14,13 @@ public class PersistenceBean {
 	private EntityManagerFactory factory;
 
 	public PersistenceBean() {
-		factory = Persistence.createEntityManagerFactory("production");
+		factory = Persistence.createEntityManagerFactory("testing");
 	}
-	
+
 	public <T> List<T> findAll(Class<T> clazz) {
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		TypedQuery<T> query = manager.createQuery("SELECT x from " + clazz.getName() +" x", clazz);
+		TypedQuery<T> query = manager.createQuery("SELECT x from " + clazz.getName() + " x", clazz);
 		List<T> list = query.getResultList();
 		manager.getTransaction().commit();
 		return list;

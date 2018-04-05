@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -18,27 +17,23 @@ public class Game {
 	private UUID gameId;
 
 	@OneToMany
-	private Set<User> users;
+	private Set<PlayingUser> users;
 
 	@OneToMany
 	private List<Question> questions;
 
-	@Column
-	private int points;
-
-	public Game(UUID gameId, Set<User> users, List<Question> questions) {
+	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
 		assertNotNull(gameId);
 		this.gameId = gameId;
 		this.users = users;
 		this.questions = questions;
-		this.points = 0;
 	}
 
 	public UUID getGameId() {
 		return gameId;
 	}
 
-	public Set<User> getUsers() {
+	public Set<PlayingUser> getUsers() {
 		return users;
 	}
 
@@ -46,16 +41,11 @@ public class Game {
 		return questions;
 	}
 
-	public int getPoints() {
-		return points;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((gameId == null) ? 0 : gameId.hashCode());
-		result = prime * result + points;
 		result = prime * result + ((questions == null) ? 0 : questions.hashCode());
 		result = prime * result + ((users == null) ? 0 : users.hashCode());
 		return result;
@@ -74,8 +64,6 @@ public class Game {
 			if (other.gameId != null)
 				return false;
 		} else if (!gameId.equals(other.gameId))
-			return false;
-		if (points != other.points)
 			return false;
 		if (questions == null) {
 			if (other.questions != null)

@@ -7,7 +7,7 @@ public interface IQuizduellService {
 
 	Question getQuestion();
 
-	void getQuestion(Answer answer);
+	void postAnswer(Answer answer);
 
 	void ready();
 

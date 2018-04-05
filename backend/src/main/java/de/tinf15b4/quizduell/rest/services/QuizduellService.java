@@ -3,7 +3,6 @@ package de.tinf15b4.quizduell.rest.services;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -24,10 +23,10 @@ public class QuizduellService implements IQuizduellService {
 	}
 
 	@Override
-	@PUT
+	@POST
 	@Path("/answer")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void getQuestion(Answer answer) {
+	public void postAnswer(Answer answer) {
 
 	}
 
