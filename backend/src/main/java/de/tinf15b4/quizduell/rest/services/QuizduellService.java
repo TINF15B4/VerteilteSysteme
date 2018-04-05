@@ -1,5 +1,6 @@
 package de.tinf15b4.quizduell.rest.services;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -31,10 +32,20 @@ public class QuizduellService implements IQuizduellService {
 
 	@Override
 	@GET
-	@Path("/question/{gameId}")
+	@Path("/question/{gameId}/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Question getQuestion(@PathParam("gameId") UUID gameId) {
-		return null;
+	public Question getQuestion(@PathParam("gameId") UUID gameId, @PathParam("gameId") long userId) {
+		// TODO Timecheck
+		Game game = persistenceBean.getGameWithId(gameId);
+		if (game.getCurrentUser().getId() == userId) {
+			// same user still, return same question
+			return game.getCurrentQuestion();
+		} else {
+			// next question
+			Question question = game.nextQuestion();
+			persistenceBean.update(game);
+			return question;
+		}
 	}
 
 	@Override
@@ -43,6 +54,7 @@ public class QuizduellService implements IQuizduellService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean postAnswer(Answer answer, @PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
+		// TODO timecheck
 		Game game = persistenceBean.getGameWithId(gameId);
 		for (PlayingUser playingUser : game.getUsers()) {
 			if (playingUser.getUser().getId() == userId) {
@@ -51,7 +63,7 @@ public class QuizduellService implements IQuizduellService {
 				if (currentQuestion.getAnswers().contains(answer)) {
 					if (currentQuestion.getCorrectAnswer().equals(answer)) {
 						playingUser.incrementPoints();
-						persistenceBean.updateUser(playingUser);
+						persistenceBean.update(playingUser);
 						return true;
 					}
 				} else {
@@ -76,7 +88,16 @@ public class QuizduellService implements IQuizduellService {
 	@Path("/points/{gameId}/{userId}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public int getPoints(@PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
-		return 0;
+		Game game = persistenceBean.getGameWithId(gameId);
+		Optional<PlayingUser> user = game.getUsers().stream().filter(u -> u.getId() == userId).findFirst();
+		if (!user.isPresent()) {
+			LOGGER.error("Invalid user id for this game");
+			return -1;
+			// FIXME throw Exception
+		} else {
+			return user.get().getPoints();
+		}
+
 	}
 
 }

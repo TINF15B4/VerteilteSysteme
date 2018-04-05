@@ -40,10 +40,10 @@ public class PersistenceBean {
 		return game;
 	}
 
-	public void updateUser(PlayingUser playingUser) {
+	public <T> void update(T entity) {
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		manager.merge(playingUser);
+		manager.merge(entity);
 		manager.getTransaction().commit();
 	}
 

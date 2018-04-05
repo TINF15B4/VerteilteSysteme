@@ -7,7 +7,7 @@ import de.tinf15b4.quizduell.db.Question;
 
 public interface IQuizduellService {
 
-	Question getQuestion(UUID gameId);
+	Question getQuestion(UUID gameId, long userId);
 
 	boolean postAnswer(Answer answer, UUID gameId, long userId);
 

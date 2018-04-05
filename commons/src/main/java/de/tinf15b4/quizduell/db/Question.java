@@ -13,10 +13,10 @@ import javax.persistence.OneToMany;
 @Entity
 public class Question {
 
-    public Question() {
-    }
+	public Question() {
+	}
 
-    public Question(String questionString, Set<Answer> answers, Answer correctAnswer) {
+	public Question(String questionString, Set<Answer> answers, Answer correctAnswer) {
 		this.questionString = questionString;
 		this.answers = answers;
 		this.correctAnswer = correctAnswer;

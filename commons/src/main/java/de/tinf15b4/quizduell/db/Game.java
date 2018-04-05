@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -21,10 +22,13 @@ public class Game {
 
 	@OneToMany
 	private List<Question> questions;
-	
+
+	@Column
+	private int currentQuestionIndex;
+
 	@ManyToOne
-	@JoinColumn(name = "currentQuestion")
-	private Question currentQuestion;
+	@JoinColumn(name = "currentUser")
+	private User currentUser;
 
 	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
 		this.gameId = gameId;
@@ -43,15 +47,26 @@ public class Game {
 	public List<Question> getQuestions() {
 		return questions;
 	}
-	
+
 	public Question getCurrentQuestion() {
-		return this.currentQuestion;
+		return questions.get(currentQuestionIndex);
+	}
+
+	public User getCurrentUser() {
+		return currentUser;
+	}
+
+	public Question nextQuestion() {
+		currentQuestionIndex++;
+		return getCurrentQuestion();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + currentQuestionIndex;
+		result = prime * result + ((currentUser == null) ? 0 : currentUser.hashCode());
 		result = prime * result + ((gameId == null) ? 0 : gameId.hashCode());
 		result = prime * result + ((questions == null) ? 0 : questions.hashCode());
 		result = prime * result + ((users == null) ? 0 : users.hashCode());
@@ -67,6 +82,13 @@ public class Game {
 		if (getClass() != obj.getClass())
 			return false;
 		Game other = (Game) obj;
+		if (currentQuestionIndex != other.currentQuestionIndex)
+			return false;
+		if (currentUser == null) {
+			if (other.currentUser != null)
+				return false;
+		} else if (!currentUser.equals(other.currentUser))
+			return false;
 		if (gameId == null) {
 			if (other.gameId != null)
 				return false;

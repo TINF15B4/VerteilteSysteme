@@ -128,3 +128,7 @@ local.properties
 .scala_dependencies
 .worksheet
 
+/target/
+
+.project
+.classpath
