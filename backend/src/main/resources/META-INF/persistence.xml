@@ -8,6 +8,7 @@
     <class>de.tinf15b4.quizduell.db.Game</class>
     <class>de.tinf15b4.quizduell.db.PendingGame</class>
     <class>de.tinf15b4.quizduell.db.User</class>
+    <class>de.tinf15b4.quizduell.db.PlayingUser</class>
 
         <properties>
             <property name="hibernate.show_sql" value="false"/>
@@ -28,6 +29,7 @@
     <class>de.tinf15b4.quizduell.db.Game</class>
     <class>de.tinf15b4.quizduell.db.PendingGame</class>
     <class>de.tinf15b4.quizduell.db.User</class>
+    <class>de.tinf15b4.quizduell.db.PlayingUser</class>
 
         <properties>
             <property name="hibernate.show_sql" value="false"/>
