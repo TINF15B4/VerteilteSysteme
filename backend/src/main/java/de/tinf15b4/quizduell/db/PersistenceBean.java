@@ -1,6 +1,9 @@
 package de.tinf15b4.quizduell.db;
 
+import com.google.common.collect.Sets;
+
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -35,6 +38,25 @@ public class PersistenceBean {
 		List<Game> list = query.getResultList();
 		manager.getTransaction().commit();
 		return list;
+	}
+
+	public Question getRandomQuestion(){
+		Random rand = new Random();
+		EntityManager manager = factory.createEntityManager();
+		manager.getTransaction().begin();
+		TypedQuery<Question> query = manager.createQuery("SELECT x from " + "Question x WHERE id = " + rand.nextInt(1800), Question.class);
+		List<Question> list = query.getResultList();
+		manager.getTransaction().commit();
+		try {
+			return list.get(0);
+		}catch (Exception e){
+			Answer A1 = new Answer("Ja!");
+			Answer A2 = new Answer("Nein!");
+			Answer A3 = new Answer("Vielleicht");
+			Answer A4 = new Answer("Ihr seit ja echt scheiße!");
+			return new Question("Ist uns ein Fehler unterlaufen?", Sets.newHashSet(A1, A2, A3, A4), A1);
+
+		}
 	}
 
 }
