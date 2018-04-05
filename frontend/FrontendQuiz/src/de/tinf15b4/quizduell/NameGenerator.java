@@ -6,10 +6,16 @@ import java.util.Random;
 
 public class NameGenerator {
     private final String[] names =
-            {"Ben", "Jonas", "Leon", "Paul", "Finn", "Noah", "Elias", "Luis", "Felix", "Lukas", "Henry",
-                    "Maximilian","Luca", "Oskar", "Emil", "Anton", "Max", "Theo", "Jakob", "Matteo", "Liam",
-            "Moritz", "Julian", "Leo", "David", "Alexander", "Milan", "Philipp", "Niklas", "Karl", "Tim",
-            "Samuel", "Mats", "Tom", "Leonard", "Erik", "Jonathan", "Hannes", "Rafael", "Linus"};
+            {"Ben", "Jonas", "Leon", "Paul", "Finn", "Noah", "Elias", "Luis", "Felix", "Lukas",
+            "Henry", "Maximilian", "Luca", "Oskar", "Emil", "Anton", "Max", "Theo", "Jakob", "Matteo",
+            "Liam", "Moritz", "Julian", "Leo", "David", "Alexander", "Milan", "Philipp", "Niklas", "Karl",
+            "Tim", "Samuel", "Mats", "Tom", "Leonard", "Erik", "Jonathan", "Hannes", "Rafael", "Linus",
+            "Jan", "Jonah", "Fabian", "Vincent", "Lennard", "Mika", "Adrian", "Till", "Simon", "Jannik",
+            "Emma", "Hannah", "Mia", "Sophia", "Emilia", "Lina", "Anna", "Marie", "Mila", "Lea",
+            "Leni", "Clara", "Lena", "Luisa", "Luisa", "Leonie", "Amelie", "Emily", "Johanna", "Ella", "Nele",
+            "Sophie", "Charlotte", "Ida", "Lilly", "Laura", "Maja", "Mathilda", "Lara", "Frieda", "Lia",
+            "Greta", "Lotta", "Sarah", "Melina", "Paula", "Julia", "Marlene", "Pia", "Alina", "Nora",
+            "Elisa", "Victoria", "Mira", "Lisa", "Isabella", "Anni", "Juna", "Isabell", "Zoe", "Marah"};
 
     private HashMap<String, ArrayList<Character>> markovMap;
 
