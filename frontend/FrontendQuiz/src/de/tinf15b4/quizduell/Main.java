@@ -1,4 +1,4 @@
-package application;
+package de.tinf15b4.quizduell;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

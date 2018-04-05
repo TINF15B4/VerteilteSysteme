@@ -1,4 +1,4 @@
-package application;
+package de.tinf15b4.quizduell;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
