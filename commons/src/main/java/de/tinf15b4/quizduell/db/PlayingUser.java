@@ -2,11 +2,17 @@ package de.tinf15b4.quizduell.db;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class PlayingUser {
+
+	@Id
+	@GeneratedValue
+	private long id;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -18,6 +24,10 @@ public class PlayingUser {
 	public PlayingUser(User user, int points) {
 		this.user = user;
 		this.points = points;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	public int getPoints() {
@@ -32,6 +42,7 @@ public class PlayingUser {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + points;
 		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
@@ -46,6 +57,8 @@ public class PlayingUser {
 		if (getClass() != obj.getClass())
 			return false;
 		PlayingUser other = (PlayingUser) obj;
+		if (id != other.id)
+			return false;
 		if (points != other.points)
 			return false;
 		if (user == null) {
