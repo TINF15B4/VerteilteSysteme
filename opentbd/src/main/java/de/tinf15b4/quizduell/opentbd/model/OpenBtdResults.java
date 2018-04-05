@@ -6,11 +6,11 @@ import java.util.List;
 
 public class OpenBtdResults {
     Double response_code;
-    private List<Question> results;
+    private List<OpenBtdQuestion> results;
 
-    public List<Question> getResults() throws UnsupportedEncodingException {
-        List<Question> decQuestions = new ArrayList<Question>(results.size());
-        for (Question q : results) {
+    public List<OpenBtdQuestion> getResults() throws UnsupportedEncodingException {
+        List<OpenBtdQuestion> decQuestions = new ArrayList<OpenBtdQuestion>(results.size());
+        for (OpenBtdQuestion q : results) {
             decQuestions.add(q.decode());
         }
         return decQuestions;
