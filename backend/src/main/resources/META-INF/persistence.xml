@@ -20,4 +20,25 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
+    
+     <persistence-unit name="testing" transaction-type="RESOURCE_LOCAL">
+    
+    <class>de.tinf15b4.quizduell.db.Answer</class>
+    <class>de.tinf15b4.quizduell.db.Question</class>
+    <class>de.tinf15b4.quizduell.db.Game</class>
+    <class>de.tinf15b4.quizduell.db.PendingGame</class>
+    <class>de.tinf15b4.quizduell.db.User</class>
+
+        <properties>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.connection.driver_class" value="org.h2.Driver"/>
+            <property name="hibernate.connection.url" value="jdbc:h2:file:~/quizduell_db"/>
+            <property name="hibernate.connection.username" value="sa"/>
+            <property name="hibernate.connection.password" value="sa"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+        </properties>
+    </persistence-unit>
+    
 </persistence>
