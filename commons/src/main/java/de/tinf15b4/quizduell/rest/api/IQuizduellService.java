@@ -7,11 +7,11 @@ import de.tinf15b4.quizduell.db.Question;
 
 public interface IQuizduellService {
 
-	Question getQuestion();
+	Question getQuestion(UUID gameId);
 
 	boolean postAnswer(Answer answer, UUID gameId, long userId);
 
-	void ready();
+	UUID ready();
 
-	int getPoints();
+	int getPoints(UUID gameId, long userId);
 }
