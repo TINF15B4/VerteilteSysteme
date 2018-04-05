@@ -1,6 +1,6 @@
 package de.tinf15b4.quizduell.db;
 
-import static org.junit.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotNull;
 
 import java.util.List;
 import java.util.Set;
