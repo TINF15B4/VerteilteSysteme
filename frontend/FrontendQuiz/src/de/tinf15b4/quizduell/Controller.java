@@ -10,9 +10,13 @@ public class Controller {
 
 	boolean isClicked = false;
 	boolean isStarted = false;
+	
+	String playerName = "";
 
 	@FXML
 	private Label lblQuestion;
+	@FXML
+	private Label lblPlayerName;
 	@FXML
 	private Button btnAnswer1;
 	@FXML
@@ -24,6 +28,12 @@ public class Controller {
 	@FXML
 	private ProgressIndicator progressIndicator;
 
+	public void initialize () {
+		NameGenerator newName = new NameGenerator();
+		playerName = newName.getName();
+		lblPlayerName.setText("Hello " + playerName);
+	}
+	
 	@FXML
 	protected void handleSubmitButton1Action(ActionEvent event) {
 		if (isStarted) {
@@ -60,10 +70,6 @@ public class Controller {
 	@FXML
 	public void handleQuestion() {
 
-		btnAnswer1.setDisable(false);
-		btnAnswer2.setDisable(false);
-		btnAnswer3.setDisable(false);
-		btnAnswer4.setDisable(false);
 		progressIndicator.setProgress(0.0);
 		lblQuestion.setText("Ist das eine Testfrage?");
 		btnAnswer1.setText("Ja");
@@ -84,10 +90,7 @@ public class Controller {
 						System.out.println(v);
 					}
 				}
-				btnAnswer1.setDisable(true);
-				btnAnswer2.setDisable(true);
-				btnAnswer3.setDisable(true);
-				btnAnswer4.setDisable(true);
+				isStarted = false;
 			}
 		};
 		progress.start();

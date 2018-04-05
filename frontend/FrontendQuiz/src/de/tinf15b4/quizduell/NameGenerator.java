@@ -1,7 +1,5 @@
 package de.tinf15b4.quizduell;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
