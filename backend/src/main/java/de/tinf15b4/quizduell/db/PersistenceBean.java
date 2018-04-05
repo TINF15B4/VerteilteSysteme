@@ -26,15 +26,22 @@ public class PersistenceBean {
 		manager.getTransaction().commit();
 		return list;
 	}
-	
-	
-	public List<Game> getGameWithId(UUID gameId) {
+
+	public Game getGameWithId(UUID gameId) {
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		TypedQuery<Game> query = (TypedQuery<Game>) manager.createQuery("SELECT x from Game x where gameId = '" + gameId.toString().replaceAll("-","")+"'", Game.class);
-		List<Game> list = query.getResultList();
+		TypedQuery<Game> query = manager.createQuery(
+				"SELECT x from Game x where gameId = '" + gameId.toString().replaceAll("-", "") + "'", Game.class);
+		Game game = query.getSingleResult();
 		manager.getTransaction().commit();
-		return list;
+		return game;
+	}
+
+	public void updateUser(PlayingUser playingUser) {
+		EntityManager manager = factory.createEntityManager();
+		manager.getTransaction().begin();
+		manager.merge(playingUser);
+		manager.getTransaction().commit();
 	}
 
 }
