@@ -1,7 +1,5 @@
 package de.tinf15b4.quizduell.db;
 
-import static junit.framework.Assert.assertNotNull;
-
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +21,6 @@ public class Game {
 	private List<Question> questions;
 
 	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
-		assertNotNull(gameId);
 		this.gameId = gameId;
 		this.users = users;
 		this.questions = questions;
