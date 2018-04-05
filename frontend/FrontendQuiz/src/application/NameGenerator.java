@@ -29,8 +29,6 @@ public class NameGenerator {
     }
 
     private void generateMap(int chainLength) {
-        // TODO Implement map generation from names
-
         for (String name : names) {
             String strippedName = name.trim();
             String lengthenedName = String.format("%" + chainLength + "s", "") + strippedName;
@@ -50,7 +48,6 @@ public class NameGenerator {
             // Add newline as end of name
             this.markovMap.get(lengthenedName.substring(strippedName.length(), strippedName.length()+chainLength)).add('\n');
         }
-
     }
 
 }
