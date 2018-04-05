@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -19,6 +21,10 @@ public class Game {
 
 	@OneToMany
 	private List<Question> questions;
+	
+	@ManyToOne
+	@JoinColumn(name = "currentQuestion")
+	private Question currentQuestion;
 
 	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
 		this.gameId = gameId;
@@ -36,6 +42,10 @@ public class Game {
 
 	public List<Question> getQuestions() {
 		return questions;
+	}
+	
+	public Question getCurrentQuestion() {
+		return this.currentQuestion;
 	}
 
 	@Override
