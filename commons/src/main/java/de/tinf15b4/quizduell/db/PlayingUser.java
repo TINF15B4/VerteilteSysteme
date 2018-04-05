@@ -33,6 +33,10 @@ public class PlayingUser {
 	public int getPoints() {
 		return points;
 	}
+	
+	public void incrementPoints() {
+		this.points++;
+	}
 
 	public User getUser() {
 		return user;

@@ -1,6 +1,7 @@
 package de.tinf15b4.quizduell.db;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -22,6 +23,16 @@ public class PersistenceBean {
 		manager.getTransaction().begin();
 		TypedQuery<T> query = manager.createQuery("SELECT x from " + clazz.getName() + " x", clazz);
 		List<T> list = query.getResultList();
+		manager.getTransaction().commit();
+		return list;
+	}
+	
+	
+	public List<Game> getGameWithId(UUID gameId) {
+		EntityManager manager = factory.createEntityManager();
+		manager.getTransaction().begin();
+		TypedQuery<Game> query = (TypedQuery<Game>) manager.createQuery("SELECT x from Game x where gameId = '" + gameId.toString().replaceAll("-","")+"'", Game.class);
+		List<Game> list = query.getResultList();
 		manager.getTransaction().commit();
 		return list;
 	}
