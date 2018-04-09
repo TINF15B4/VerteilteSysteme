@@ -70,10 +70,19 @@ public class Controller {
             restInterface.postAnswer((Answer) this.answers[answer - 1]);
             btnStart.setDisable(false);
             isClicked = true;
+            isStarted = false;
+            setDisableAllAnswerButtons(true);
         }
     }
 
-	@FXML
+    private void setDisableAllAnswerButtons(boolean disable) {
+        btnAnswer1.setDisable(disable);
+        btnAnswer2.setDisable(disable);
+        btnAnswer3.setDisable(disable);
+        btnAnswer4.setDisable(disable);
+    }
+
+    @FXML
 	protected void handleSubmitButtonStartAction(ActionEvent event) {
 		handleQuestion();
 	}
@@ -89,8 +98,11 @@ public class Controller {
         btnAnswer2.setText(((Answer) answers[1]).getAnswerString());
         btnAnswer3.setText(((Answer) answers[2]).getAnswerString());
         btnAnswer4.setText(((Answer) answers[3]).getAnswerString());
+        setDisableAllAnswerButtons(false);
 
 		progressIndicator.setProgress(0.0);
+
+		isStarted = true;
 
 		Thread progress = new Thread() {
 			public void run() {
