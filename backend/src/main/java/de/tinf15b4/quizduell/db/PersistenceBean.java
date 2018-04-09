@@ -12,6 +12,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
+/**
+ * Use this classes methods for read operations only. Move everything else to
+ * the {@link Transaction} class, so we can do multiple changes in one transaction.
+ */
 @ApplicationScoped
 public class PersistenceBean {
 
@@ -19,6 +23,10 @@ public class PersistenceBean {
 
 	public PersistenceBean() {
 		factory = Persistence.createEntityManagerFactory("testing");
+	}
+
+	public Transaction transaction() {
+		return new Transaction(factory.createEntityManager());
 	}
 
 	public <T> List<T> findAll(Class<T> clazz) {
@@ -40,23 +48,17 @@ public class PersistenceBean {
 		return game;
 	}
 
-	public <T> void update(T entity) {
-		EntityManager manager = factory.createEntityManager();
-		manager.getTransaction().begin();
-		manager.merge(entity);
-		manager.getTransaction().commit();
-	}
-
-	public Question getRandomQuestion(){
+	public Question getRandomQuestion() {
 		Random rand = new Random();
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		TypedQuery<Question> query = manager.createQuery("SELECT x from " + "Question x WHERE id = " + rand.nextInt(1800), Question.class);
+		TypedQuery<Question> query = manager
+				.createQuery("SELECT x from " + "Question x WHERE id = " + rand.nextInt(1800), Question.class);
 		List<Question> list = query.getResultList();
 		manager.getTransaction().commit();
 		try {
 			return list.get(0);
-		}catch (Exception e){
+		} catch (Exception e) {
 			Answer A1 = new Answer("Ja!");
 			Answer A2 = new Answer("Nein!");
 			Answer A3 = new Answer("Vielleicht");

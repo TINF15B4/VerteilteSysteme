@@ -43,7 +43,7 @@ public class QuizduellService implements IQuizduellService {
 		} else {
 			// next question
 			Question question = game.nextQuestion();
-			persistenceBean.update(game);
+			persistenceBean.transaction().update(game).commit();
 			return question;
 		}
 	}
@@ -63,7 +63,7 @@ public class QuizduellService implements IQuizduellService {
 				if (currentQuestion.getAnswers().contains(answer)) {
 					if (currentQuestion.getCorrectAnswer().equals(answer)) {
 						playingUser.incrementPoints();
-						persistenceBean.update(playingUser);
+						persistenceBean.transaction().update(playingUser).commit();
 						return true;
 					}
 				} else {
@@ -80,6 +80,7 @@ public class QuizduellService implements IQuizduellService {
 	@POST
 	@Path("/ready")
 	public UUID ready() {
+		// TODO
 		return UUID.randomUUID(); // gameId
 	}
 
