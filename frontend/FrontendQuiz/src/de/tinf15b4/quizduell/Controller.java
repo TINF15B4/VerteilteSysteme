@@ -1,10 +1,14 @@
 package de.tinf15b4.quizduell;
 
+import de.tinf15b4.quizduell.db.Answer;
+import de.tinf15b4.quizduell.db.Question;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+
+import java.util.Set;
 
 public class Controller {
 
@@ -72,6 +76,15 @@ public class Controller {
 
 	@FXML
 	public void handleQuestion() {
+        Question question = restInterface.getQuestion();
+        Object[] answers = question.getAnswers().toArray();
+
+        lblQuestion.setText(question.getQuestionString());
+
+        btnAnswer1.setText(((Answer) answers[0]).getAnswerString());
+        btnAnswer2.setText(((Answer) answers[1]).getAnswerString());
+        btnAnswer3.setText(((Answer) answers[2]).getAnswerString());
+        btnAnswer4.setText(((Answer) answers[3]).getAnswerString());
 
 	}
 
