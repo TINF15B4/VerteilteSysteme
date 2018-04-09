@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,10 +18,10 @@ public class Game {
 	@Id
 	private UUID gameId;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private Set<PlayingUser> users;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Question> questions;
 
 	@Column
@@ -29,6 +30,8 @@ public class Game {
 	@ManyToOne
 	@JoinColumn(name = "currentUser")
 	private User currentUser;
+
+	public Game() { /* HIBERNATE COMPAT ONLY */ }
 
 	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
 		this.gameId = gameId;

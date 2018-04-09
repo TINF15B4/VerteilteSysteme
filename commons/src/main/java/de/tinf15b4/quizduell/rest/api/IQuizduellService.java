@@ -14,4 +14,6 @@ public interface IQuizduellService {
 	UUID ready(long userid);
 
 	int getPoints(UUID gameId, long userId);
+
+	long createUser(String username);
 }

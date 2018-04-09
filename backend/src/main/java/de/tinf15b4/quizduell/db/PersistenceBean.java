@@ -56,6 +56,19 @@ public class PersistenceBean {
 		return o;
 	}
 
+	public <T> T persist(T o) {
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			em.persist(o);
+			em.getTransaction().commit();
+		} catch (Throwable t) {
+			em.getTransaction().rollback();
+			throw t;
+		}
+		return o;
+	}
+
 	public Game getGameWithId(UUID gameId) {
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
@@ -93,10 +106,12 @@ public class PersistenceBean {
 		em.getTransaction().begin();
 		try {
 			TypedQuery<PendingGame> query = em.createQuery(
-					"SELECT x from PendingGame x WHERE x.user <> " + user.getId(),
+					"SELECT x from PendingGame x WHERE x.waitingUser.id <> " + user.getId(),
 					PendingGame.class);
-			g = query.getSingleResult();
-			if (g != null) {
+			query.setMaxResults(1);
+			List<PendingGame> gl = query.getResultList();
+			if (gl.size() > 0) {
+				g = gl.get(0);
 				em.remove(g);
 			}
 			em.getTransaction().commit();

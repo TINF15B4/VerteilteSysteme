@@ -2,6 +2,7 @@ package de.tinf15b4.quizduell.db;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,10 +30,10 @@ public class Question {
 	@Column
 	private String questionString;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private Set<Answer> answers;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "answer_id")
 	private Answer correctAnswer;
 
