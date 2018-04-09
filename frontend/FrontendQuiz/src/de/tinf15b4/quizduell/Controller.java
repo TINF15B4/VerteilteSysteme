@@ -41,7 +41,13 @@ public class Controller {
 		playerName = newName.getName();
 		lblPlayerName.setText("Hello " + playerName);
 
-		restInterface = new RestInterface("TODO Real URL");
+		try {
+			restInterface = new RestInterface("TODO Real URL");
+		} catch (Exception e){
+			lblQuestion.setText("Es konnte keine Verbindung zum Server hergestellt werden. Bitte prüfen Sie ihre Internetverbindung und starten Sie die Anwendung neu.");
+			btnStart.setDisable(true);
+			setDisableAllAnswerButtons(true);
+		}
 	}
 	
 	@FXML
