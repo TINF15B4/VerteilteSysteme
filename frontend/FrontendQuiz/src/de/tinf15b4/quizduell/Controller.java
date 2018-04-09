@@ -15,6 +15,7 @@ public class Controller {
 	boolean isClicked = false;
 	boolean isStarted = false;
 	RestInterface restInterface;
+    private Object[] answers;
 	
 	String playerName = "";
 
@@ -35,7 +36,7 @@ public class Controller {
 	@FXML
 	private ProgressIndicator progressIndicator;
 
-	public void initialize () {
+    public void initialize () {
 		NameGenerator newName = new NameGenerator();
 		playerName = newName.getName();
 		lblPlayerName.setText("Hello " + playerName);
@@ -45,31 +46,32 @@ public class Controller {
 	
 	@FXML
 	protected void handleSubmitButton1Action(ActionEvent event) {
-		if (isStarted) {
-			isClicked = true;
-		}
+        handleSubmit(1);
 	}
 
 	@FXML
 	protected void handleSubmitButton2Action(ActionEvent event) {
-		if (isStarted) {
-			isClicked = true;
-		}
+        handleSubmit(2);
 	}
 
 	@FXML
 	protected void handleSubmitButton3Action(ActionEvent event) {
-		if (isStarted) {
-			isClicked = true;
-		}
+        handleSubmit(3);
 	}
 
 	@FXML
 	protected void handleSubmitButton4Action(ActionEvent event) {
-		if (isStarted) {
-			isClicked = true;
-		}
+        handleSubmit(4);
 	}
+
+	@FXML
+    private void handleSubmit(int answer){
+        if (isStarted) {
+            restInterface.postAnswer((Answer) this.answers[answer - 1]);
+            btnStart.setDisable(false);
+            isClicked = true;
+        }
+    }
 
 	@FXML
 	protected void handleSubmitButtonStartAction(ActionEvent event) {
@@ -79,7 +81,7 @@ public class Controller {
 	@FXML
 	public void handleQuestion() {
         Question question = restInterface.getQuestion();
-        Object[] answers = question.getAnswers().toArray();
+        answers = question.getAnswers().toArray();
 
         lblQuestion.setText(question.getQuestionString());
 
