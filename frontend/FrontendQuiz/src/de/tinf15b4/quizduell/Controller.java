@@ -10,6 +10,7 @@ public class Controller {
 
 	boolean isClicked = false;
 	boolean isStarted = false;
+	RestInterface restInterface;
 	
 	String playerName = "";
 
@@ -32,6 +33,8 @@ public class Controller {
 		NameGenerator newName = new NameGenerator();
 		playerName = newName.getName();
 		lblPlayerName.setText("Hello " + playerName);
+
+		restInterface = new RestInterface("TODO Real URL");
 	}
 	
 	@FXML
@@ -69,6 +72,11 @@ public class Controller {
 
 	@FXML
 	public void handleQuestion() {
+
+	}
+
+	@FXML
+	public void handleQuestionDummy() {
 
 		progressIndicator.setProgress(0.0);
 		lblQuestion.setText("Ist das eine Testfrage?");
