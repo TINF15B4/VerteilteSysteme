@@ -1,7 +1,9 @@
 package de.tinf15b4.quizduell.rest.services;
 
-import java.util.Optional;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -85,6 +87,7 @@ public class QuizduellService implements IQuizduellService {
 	@Override
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/ready")
 	public UUID ready(long userid) {
 		User u = persistenceBean.findById(User.class, userid);
@@ -97,8 +100,11 @@ public class QuizduellService implements IQuizduellService {
 			Set<PlayingUser> users = new HashSet<>();
 			users.add(new PlayingUser(u, 0));
 			users.add(new PlayingUser(pg.getWaitingUser(), 0));
-			// TODO: add questions
-			Game g = new Game(pg.getGameId(), users, null);
+			List<Question> questionList = new ArrayList<>();
+			for (int i = 0; i < 5; ++i) {
+				questionList.add(persistenceBean.getRandomQuestion());
+			}
+			Game g = new Game(pg.getGameId(), users, questionList);
 
 			persistenceBean.merge(g);
 			return g.getGameId();
@@ -127,6 +133,18 @@ public class QuizduellService implements IQuizduellService {
 			return user.get().getPoints();
 		}
 
+	}
+
+	@Override
+	@POST
+	@Path("/user")
+	@Consumes("application/json")
+	@Produces("application/json")
+	public long createUser(String username) {
+		User u = new User();
+		u.setUsername(username);
+		persistenceBean.persist(u);
+		return u.getId();
 	}
 
 }

@@ -17,6 +17,8 @@ public class PendingGame {
 	@JoinColumn(name = "user_id")
 	private User waitingUser;
 
+	public PendingGame() { /* HIBERNATE COMPAT ONLY */ }
+
 	public PendingGame(User waitingUser) {
 		this.waitingUser = waitingUser;
 		this.gameId = UUID.randomUUID();
