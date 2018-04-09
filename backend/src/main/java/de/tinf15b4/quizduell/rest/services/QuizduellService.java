@@ -3,7 +3,6 @@ package de.tinf15b4.quizduell.rest.services;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -124,15 +123,13 @@ public class QuizduellService implements IQuizduellService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public int getPoints(@PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
 		Game game = persistenceBean.getGameWithId(gameId);
-		Optional<PlayingUser> user = game.getUsers().stream().filter(u -> u.getId() == userId).findFirst();
-		if (!user.isPresent()) {
-			LOGGER.error("Invalid user id for this game");
-			return -1;
-			// FIXME throw Exception
-		} else {
-			return user.get().getPoints();
+		for (PlayingUser u : game.getUsers()) {
+			if (u.getUser().getId() == userId) {
+				return u.getPoints();
+			}
 		}
 
+		throw new WebApplicationException(Response.status(400).entity("Invalid user id").build());
 	}
 
 	@Override
