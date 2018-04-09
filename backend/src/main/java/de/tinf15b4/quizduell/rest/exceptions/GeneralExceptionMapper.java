@@ -1,5 +1,6 @@
 package de.tinf15b4.quizduell.rest.exceptions;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -16,10 +17,14 @@ public class GeneralExceptionMapper implements ExceptionMapper<Throwable> {
 	@Override
 	public Response toResponse(Throwable e) {
 		logger.error("", e);
-		return Response.status(500)//
-				.entity("The server did something wrong. See server log for additional information")//
-				.type(MediaType.TEXT_PLAIN)//
-				.build();
+		if (e instanceof WebApplicationException) {
+			return ((WebApplicationException)e).getResponse();
+		} else {
+			return Response.status(500)//
+					.entity("The server did something wrong. See server log for additional information")//
+					.type(MediaType.TEXT_PLAIN)//
+					.build();
+		}
 	}
 
 }

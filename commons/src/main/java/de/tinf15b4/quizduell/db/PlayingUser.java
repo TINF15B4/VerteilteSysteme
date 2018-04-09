@@ -21,6 +21,8 @@ public class PlayingUser {
 	@Column
 	private int points;
 
+	public PlayingUser() { /* HIBERNATE COMPAT */ }
+
 	public PlayingUser(User user, int points) {
 		this.user = user;
 		this.points = points;

@@ -1,7 +1,5 @@
 package de.tinf15b4.quizduell.db;
 
-import com.google.common.collect.Sets;
-
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -16,6 +14,8 @@ import javax.persistence.TypedQuery;
  * Use this classes methods for read operations only. Move everything else to
  * the {@link Transaction} class, so we can do multiple changes in one transaction.
  */
+import com.google.common.collect.Sets;
+
 @ApplicationScoped
 public class PersistenceBean {
 
@@ -36,6 +36,37 @@ public class PersistenceBean {
 		List<T> list = query.getResultList();
 		manager.getTransaction().commit();
 		return list;
+	}
+
+	public <T> T findById(Class<T> clazz, Object id) {
+		EntityManager em = factory.createEntityManager();
+		return em.find(clazz, id);
+	}
+
+	public <T> T merge(T o) {
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			o = em.merge(o);
+			em.getTransaction().commit();
+		} catch (Throwable t) {
+			em.getTransaction().rollback();
+			throw t;
+		}
+		return o;
+	}
+
+	public <T> T persist(T o) {
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			em.persist(o);
+			em.getTransaction().commit();
+		} catch (Throwable t) {
+			em.getTransaction().rollback();
+			throw t;
+		}
+		return o;
 	}
 
 	public Game getGameWithId(UUID gameId) {
@@ -68,4 +99,27 @@ public class PersistenceBean {
 		}
 	}
 
+	public PendingGame findAndConsumePendingGame(User user) {
+		PendingGame g = null;
+
+		EntityManager em = factory.createEntityManager();
+		em.getTransaction().begin();
+		try {
+			TypedQuery<PendingGame> query = em.createQuery(
+					"SELECT x from PendingGame x WHERE x.waitingUser.id <> " + user.getId(),
+					PendingGame.class);
+			query.setMaxResults(1);
+			List<PendingGame> gl = query.getResultList();
+			if (gl.size() > 0) {
+				g = gl.get(0);
+				em.remove(g);
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			throw e;
+		}
+
+		return g;
+	}
 }
