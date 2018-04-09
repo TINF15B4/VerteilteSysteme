@@ -31,6 +31,8 @@ public class Controller {
 	@FXML
 	private Button btnAnswer4;
 	@FXML
+	private Button btnStart;
+	@FXML
 	private ProgressIndicator progressIndicator;
 
 	public void initialize () {
@@ -85,6 +87,27 @@ public class Controller {
         btnAnswer2.setText(((Answer) answers[1]).getAnswerString());
         btnAnswer3.setText(((Answer) answers[2]).getAnswerString());
         btnAnswer4.setText(((Answer) answers[3]).getAnswerString());
+
+		progressIndicator.setProgress(0.0);
+
+		Thread progress = new Thread() {
+			public void run() {
+				while (progressIndicator.getProgress() <= 1 && !isClicked) {
+					try {
+						progressIndicator.setProgress(progressIndicator.getProgress() + 0.1);
+						Thread.sleep(1000);
+
+					} catch (InterruptedException v) {
+						System.out.println(v);
+					}
+				}
+				isStarted = false;
+			}
+		};
+		progress.start();
+
+		btnStart.setDisable(true);
+		btnStart.setText("Next Question");
 
 	}
 
