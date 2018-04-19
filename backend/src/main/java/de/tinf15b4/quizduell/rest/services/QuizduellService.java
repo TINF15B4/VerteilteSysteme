@@ -25,6 +25,7 @@ import de.tinf15b4.quizduell.db.Game;
 import de.tinf15b4.quizduell.db.PendingGame;
 import de.tinf15b4.quizduell.db.PersistenceBean;
 import de.tinf15b4.quizduell.db.PlayingUser;
+import de.tinf15b4.quizduell.db.Points;
 import de.tinf15b4.quizduell.db.Question;
 import de.tinf15b4.quizduell.db.QuestionDTO;
 import de.tinf15b4.quizduell.db.User;
@@ -128,16 +129,21 @@ public class QuizduellService implements IQuizduellService {
 	@Override
 	@GET
 	@Path("/points/{gameId}/{userId}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public int getPoints(@PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public Points getPoints(@PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
 		Game game = persistenceBean.getGameWithId(gameId);
+		int myPoints = -1;
+		int otherPoints = 0;
 		for (PlayingUser u : game.getUsers()) {
 			if (u.getUser().getId() == userId) {
-				return u.getPoints();
+				myPoints = u.getPoints();
+			} else {
+				otherPoints = u.getPoints();
 			}
 		}
-
-		throw new WebApplicationException(Response.status(400).entity("Invalid user id").build());
+		if (myPoints == -1)
+			throw new WebApplicationException(Response.status(400).entity("Invalid user id").build());
+		return new Points(myPoints, otherPoints);
 	}
 
 	@Override
