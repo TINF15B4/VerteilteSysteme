@@ -26,11 +26,14 @@ import de.tinf15b4.quizduell.db.PendingGame;
 import de.tinf15b4.quizduell.db.PersistenceBean;
 import de.tinf15b4.quizduell.db.PlayingUser;
 import de.tinf15b4.quizduell.db.Question;
+import de.tinf15b4.quizduell.db.QuestionDTO;
 import de.tinf15b4.quizduell.db.User;
 import de.tinf15b4.quizduell.rest.api.IQuizduellService;
 
 @Path("/api")
 public class QuizduellService implements IQuizduellService {
+
+	private static final int ANSWER_TIMEOUT_MILLIS = 20000;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuizduellService.class);
 
@@ -41,17 +44,17 @@ public class QuizduellService implements IQuizduellService {
 	@GET
 	@Path("/question/{gameId}/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Question getQuestion(@PathParam("gameId") UUID gameId, @PathParam("gameId") long userId) {
-		// TODO Timecheck
+	public QuestionDTO getQuestion(@PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
 		Game game = persistenceBean.getGameWithId(gameId);
 		if (game.getCurrentUser().getId() == userId) {
 			// same user still, return same question
-			return game.getCurrentQuestion();
+			return game.getCurrentQuestion().toDTO();
 		} else {
 			// next question
 			Question question = game.nextQuestion();
+			game.setTimestamp(System.currentTimeMillis());
 			persistenceBean.transaction().update(game).commit();
-			return question;
+			return question.toDTO();
 		}
 	}
 
@@ -61,22 +64,27 @@ public class QuizduellService implements IQuizduellService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean postAnswer(Answer answer, @PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
-		// TODO timecheck
 		Game game = persistenceBean.getGameWithId(gameId);
 		for (PlayingUser playingUser : game.getUsers()) {
 			if (playingUser.getUser().getId() == userId) {
 				// We found the right user in the right game!
 				Question currentQuestion = game.getCurrentQuestion();
 				if (currentQuestion.getAnswers().contains(answer)) {
+					long diff = System.currentTimeMillis() - game.getTimestamp();
+					if (diff > ANSWER_TIMEOUT_MILLIS) {
+						throw new WebApplicationException(
+								Response.status(406).entity("Answer too late. Timeout has been reached").build());
+					}
 					if (currentQuestion.getCorrectAnswer().equals(answer)) {
 						playingUser.incrementPoints();
 						persistenceBean.transaction().update(playingUser).commit();
 						return true;
 					}
 				} else {
-					// TODO
 					// recieved an Answer that does not match the answers of the question
-					LOGGER.error("answer not in question answer set");
+					LOGGER.error("Answer not in question's answer set");
+					throw new WebApplicationException(
+							Response.status(400).entity("Answer not in question's answer set").build());
 				}
 			}
 		}

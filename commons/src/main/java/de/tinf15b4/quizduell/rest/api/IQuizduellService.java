@@ -3,11 +3,11 @@ package de.tinf15b4.quizduell.rest.api;
 import java.util.UUID;
 
 import de.tinf15b4.quizduell.db.Answer;
-import de.tinf15b4.quizduell.db.Question;
+import de.tinf15b4.quizduell.db.QuestionDTO;
 
 public interface IQuizduellService {
 
-	Question getQuestion(UUID gameId, long userId);
+	QuestionDTO getQuestion(UUID gameId, long userId);
 
 	boolean postAnswer(Answer answer, UUID gameId, long userId);
 

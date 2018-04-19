@@ -31,7 +31,11 @@ public class Game {
 	@JoinColumn(name = "currentUser")
 	private User currentUser;
 
-	public Game() { /* HIBERNATE COMPAT ONLY */ }
+	@Column
+	private long timestamp;
+
+	public Game() {
+		/* HIBERNATE COMPAT ONLY */ }
 
 	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
 		this.gameId = gameId;
@@ -59,6 +63,14 @@ public class Game {
 		return currentUser;
 	}
 
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	public Question nextQuestion() {
 		currentQuestionIndex++;
 		return getCurrentQuestion();
@@ -72,6 +84,7 @@ public class Game {
 		result = prime * result + ((currentUser == null) ? 0 : currentUser.hashCode());
 		result = prime * result + ((gameId == null) ? 0 : gameId.hashCode());
 		result = prime * result + ((questions == null) ? 0 : questions.hashCode());
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 		result = prime * result + ((users == null) ? 0 : users.hashCode());
 		return result;
 	}
@@ -101,6 +114,8 @@ public class Game {
 			if (other.questions != null)
 				return false;
 		} else if (!questions.equals(other.questions))
+			return false;
+		if (timestamp != other.timestamp)
 			return false;
 		if (users == null) {
 			if (other.users != null)
