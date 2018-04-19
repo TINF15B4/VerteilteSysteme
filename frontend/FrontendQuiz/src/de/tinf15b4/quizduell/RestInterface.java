@@ -15,42 +15,45 @@ import de.tinf15b4.quizduell.db.QuestionDTO;
 import java.util.UUID;
 
 public class RestInterface {
-	
+
 	String restServiceUrl;
 	Client client;
-	
-	private long userID; //TODO get from Rest Service
-	private UUID gameUUID; //TODO get from Rest Service
-	
+
+	private long userID;
+	private UUID gameUUID;
+
 	public RestInterface(String restServiceUrl) {
 		this.restServiceUrl = restServiceUrl;
 		client = Client.create();
 	}
-	
+
 	public boolean postAnswer(Answer answer) {
-		WebResource	answers = client.resource(UriBuilder.fromUri(restServiceUrl).path("answer").path(""+gameUUID).path(""+userID).build());
+		WebResource answers = client.resource(
+				UriBuilder.fromUri(restServiceUrl).path("answer").path("" + gameUUID).path("" + userID).build());
 		return answers.type(MediaType.APPLICATION_JSON).post(boolean.class, answer);
 	}
-	
+
 	public void postReady() {
 		WebResource ready = client.resource(UriBuilder.fromUri(restServiceUrl).path("ready").build());
 		gameUUID = ready.type(MediaType.APPLICATION_JSON).post(UUID.class, userID);
 	}
-	
+
 	public void createUser(String username) {
 		WebResource user = client.resource(UriBuilder.fromUri(restServiceUrl).path("user").build());
 		userID = user.type(MediaType.APPLICATION_JSON).post(long.class, username);
 	}
-	
+
 	public HandleQuestion getQuestion() {
-		WebResource	questions = client.resource(UriBuilder.fromUri(restServiceUrl).path("question").path(""+gameUUID).path(""+userID).build());
-		ClientResponse response =  questions.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		WebResource questions = client.resource(
+				UriBuilder.fromUri(restServiceUrl).path("question").path("" + gameUUID).path("" + userID).build());
+		ClientResponse response = questions.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		HandleQuestion handleQuestion = new HandleQuestion(response.getEntity(QuestionDTO.class), response.getStatus());
 		return handleQuestion;
 	}
-	
+
 	public Points getPoints() {
-		WebResource points = client.resource(UriBuilder.fromUri(restServiceUrl).path("points").path(""+gameUUID).path(""+userID).build());
+		WebResource points = client.resource(
+				UriBuilder.fromUri(restServiceUrl).path("points").path("" + gameUUID).path("" + userID).build());
 		return points.accept(MediaType.APPLICATION_JSON).get(Points.class);
 	}
 }

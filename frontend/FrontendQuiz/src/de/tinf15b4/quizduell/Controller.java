@@ -163,11 +163,11 @@ public class Controller {
 		} else {
 			output = "It is a draw!";
 		}
-		
+
 		output += " " + p.getMyPoints() + " : " + p.getOtherPoints();
 		lblQuestion.setText(output);
 		btnStart.setText("Start new game");
-		
+
 		btnAnswer1.setText("Answer 1");
 		btnAnswer2.setText("Answer 2");
 		btnAnswer3.setText("Answer 3");
