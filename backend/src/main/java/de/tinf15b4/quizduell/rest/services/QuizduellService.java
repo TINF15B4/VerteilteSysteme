@@ -124,9 +124,9 @@ public class QuizduellService implements IQuizduellService {
 		if (pg != null) {
 			// create game
 			List<Question> questionList = new ArrayList<>();
-			for (int i = 0; i < 5; ++i) {
-				questionList.add(persistenceBean.getRandomQuestion());
-			}
+
+			questionList.addAll(persistenceBean.getFiveRandomQuestions());
+
 			Game g = new Game(pg.getGameId(),
 					new PlayingUser(u, 0),
 					new PlayingUser(pg.getWaitingUser(), 0),
