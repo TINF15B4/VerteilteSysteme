@@ -16,14 +16,18 @@ public class RestInterface {
 	private WebResource questions;
 	private WebResource points;
 	private WebResource ready;
-
-	private UUID userUUID; //TODO get from Rest Service
+	
+	String restServiceUrl;
+	Client client;
+	
+	private long userID; //TODO get from Rest Service
 	private UUID gameUUID; //TODO get from Rest Service
 	
 	public RestInterface(String restServiceUrl) {
-		Client client = Client.create();
+		this.restServiceUrl = restServiceUrl;
+		client = Client.create();
 		answers = client.resource(UriBuilder.fromUri(restServiceUrl).path("answer").build());
-		questions = client.resource(UriBuilder.fromUri(restServiceUrl).path("question").build());
+		questions = client.resource(UriBuilder.fromUri(restServiceUrl).path("question").path(""+gameUUID).path(""+userID).build());
 		points = client.resource(UriBuilder.fromUri(restServiceUrl).path("points").build());
 		ready = client.resource(UriBuilder.fromUri(restServiceUrl).path("ready").build());
 	}
@@ -33,7 +37,12 @@ public class RestInterface {
 	}
 	
 	public void postReady() {
-		ready.post();
+		gameUUID = ready.type(MediaType.APPLICATION_JSON).post(UUID.class, userID);
+	}
+	
+	public void createUser(String username) {
+		WebResource user = client.resource(UriBuilder.fromUri(restServiceUrl).path("user").build());
+		userID = user.type(MediaType.APPLICATION_JSON).post(long.class, username);
 	}
 	
 	public Question getQuestion() {
@@ -43,5 +52,4 @@ public class RestInterface {
 	public int getPoints() {
 		return Integer.parseInt(points.get(String.class));
 	}
-
 }

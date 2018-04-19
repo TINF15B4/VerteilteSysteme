@@ -14,6 +14,7 @@ public class Controller {
 
 	boolean isClicked = false;
 	boolean isStarted = false;
+	boolean gameRunning = false;
 	RestInterface restInterface;
     private Object[] answers;
 	
@@ -47,7 +48,9 @@ public class Controller {
 			lblQuestion.setText("Es konnte keine Verbindung zum Server hergestellt werden. Bitte prüfen Sie ihre Internetverbindung und starten Sie die Anwendung neu.");
 			btnStart.setDisable(true);
 			setDisableAllAnswerButtons(true);
+			return;
 		}
+		restInterface.createUser(playerName);
 	}
 	
 	@FXML
@@ -90,12 +93,20 @@ public class Controller {
 
     @FXML
 	protected void handleSubmitButtonStartAction(ActionEvent event) {
-		handleQuestion();
+    	if(gameRunning) {
+    		handleQuestion();
+    	}else {
+    		gameRunning = true;
+    		restInterface.postReady();
+    	}		
 	}
 
 	@FXML
 	public void handleQuestion() {
         Question question = restInterface.getQuestion();
+        if(question == null) {
+        	gameRunning = false;
+        }
         answers = question.getAnswers().toArray();
 
         lblQuestion.setText(question.getQuestionString());
@@ -128,7 +139,6 @@ public class Controller {
 
 		btnStart.setDisable(true);
 		btnStart.setText("Next Question");
-
 	}
 
 	@FXML
