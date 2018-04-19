@@ -41,7 +41,7 @@ public class Controller {
 		lblPlayerName.setText("Hello " + playerName);
 
 		try {
-			restInterface = new RestInterface("TODO Real URL"); // TODO
+			restInterface = new RestInterface("http://localhost:8080/quizduell/api/"); // TODO
 		} catch (Exception e) {
 			lblQuestion.setText(
 					"Es konnte keine Verbindung zum Server hergestellt werden. Bitte pruefen Sie ihre Internetverbindung und starten Sie die Anwendung neu.");

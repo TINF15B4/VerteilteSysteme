@@ -30,17 +30,17 @@ public class RestInterface {
 	public boolean postAnswer(Answer answer) {
 		WebResource answers = client.resource(
 				UriBuilder.fromUri(restServiceUrl).path("answer").path("" + gameUUID).path("" + userID).build());
-		return answers.type(MediaType.APPLICATION_JSON).post(boolean.class, answer);
+		return answers.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(boolean.class, answer);
 	}
 
 	public void postReady() {
 		WebResource ready = client.resource(UriBuilder.fromUri(restServiceUrl).path("ready").build());
-		gameUUID = ready.type(MediaType.APPLICATION_JSON).post(UUID.class, userID);
+		gameUUID = ready.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(UUID.class, String.valueOf(userID));
 	}
 
 	public void createUser(String username) {
 		WebResource user = client.resource(UriBuilder.fromUri(restServiceUrl).path("user").build());
-		userID = user.type(MediaType.APPLICATION_JSON).post(long.class, username);
+		userID = Long.valueOf(user.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(String.class, username));
 	}
 
 	public HandleQuestion getQuestion() {
