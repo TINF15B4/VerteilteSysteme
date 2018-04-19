@@ -9,11 +9,16 @@ import com.sun.jersey.api.client.WebResource;
 import de.tinf15b4.quizduell.db.Answer;
 import de.tinf15b4.quizduell.db.Question;
 
+import java.util.UUID;
+
 public class RestInterface {
 	private WebResource answers;
 	private WebResource questions;
 	private WebResource points;
 	private WebResource ready;
+
+	private UUID userUUID; //TODO get from Rest Service
+	private UUID gameUUID; //TODO get from Rest Service
 	
 	public RestInterface(String restServiceUrl) {
 		Client client = Client.create();
