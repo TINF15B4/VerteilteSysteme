@@ -12,11 +12,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import com.google.common.collect.Sets;
-
 /**
  * Use this classes methods for read operations only. Move everything else to
- * the {@link Transaction} class, so we can do multiple changes in one transaction.
+ * the {@link Transaction} class, so we can do multiple changes in one
+ * transaction.
  */
 
 @ApplicationScoped
@@ -95,23 +94,21 @@ public class PersistenceBean {
 		return game;
 	}
 
-	public List<Question> getFiveRandomQuestions() {
+	public Question getRandomQuestion() {
 		Random rand = new Random();
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		TypedQuery<Integer> query = manager
-				.createQuery("SELECT count(*) FROM " + "Question", Integer.class);
+		TypedQuery<Long> query = manager.createQuery("SELECT count(*) FROM " + "Question", Long.class);
 
-
-		List<Integer> list = query.getResultList();
-		manager.getTransaction().commit();
-
-		int randomNumber = rand.nextInt(list.get(0) - 5);
+		Long count = query.getSingleResult();
+		int randomNumber = rand.nextInt(Math.toIntExact(count));
 
 		TypedQuery<Question> selectQuery = manager.createQuery("SELECT q FROM Question q", Question.class);
 		selectQuery.setFirstResult(randomNumber);
-		selectQuery.setMaxResults(5);
-		return selectQuery.getResultList();
+		selectQuery.setMaxResults(1);
+		List<Question> resultList = selectQuery.getResultList();
+		manager.getTransaction().commit();
+		return resultList.get(0);
 	}
 
 	public PendingGame findAndConsumePendingGame(User user) {
@@ -121,8 +118,7 @@ public class PersistenceBean {
 		em.getTransaction().begin();
 		try {
 			TypedQuery<PendingGame> query = em.createQuery(
-					"SELECT x from PendingGame x WHERE x.waitingUser.id <> " + user.getId(),
-					PendingGame.class);
+					"SELECT x from PendingGame x WHERE x.waitingUser.id <> " + user.getId(), PendingGame.class);
 			query.setMaxResults(1);
 			List<PendingGame> gl = query.getResultList();
 			if (gl.size() > 0) {

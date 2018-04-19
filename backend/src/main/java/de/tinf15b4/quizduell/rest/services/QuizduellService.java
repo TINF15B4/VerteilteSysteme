@@ -91,7 +91,7 @@ public class QuizduellService implements IQuizduellService {
 		game = persistenceBean.merge(game);
 
 		// check validity and award points
-		if (answeredQuestion.getAnswers().contains(answer)) {
+		if (answeredQuestion.getCorrectAnswer().equals(answer) || answeredQuestion.getAnswers().contains(answer)) {
 			long diff = System.currentTimeMillis() - answerTimestamp;
 			if (diff > ANSWER_TIMEOUT_MILLIS) {
 				throw new WebApplicationException(
@@ -124,12 +124,10 @@ public class QuizduellService implements IQuizduellService {
 		if (pg != null) {
 			// create game
 			List<Question> questionList = new ArrayList<>();
-
-			questionList.addAll(persistenceBean.getFiveRandomQuestions());
-
-			Game g = new Game(pg.getGameId(),
-					new PlayingUser(u, 0),
-					new PlayingUser(pg.getWaitingUser(), 0),
+			for (int i = 0; i < 5; i++) {
+				questionList.add(persistenceBean.getRandomQuestion());
+			}
+			Game g = new Game(pg.getGameId(), new PlayingUser(u, 0), new PlayingUser(pg.getWaitingUser(), 0),
 					questionList);
 			g.setCurrentUser(u);
 			g.setTimestamp(-1);

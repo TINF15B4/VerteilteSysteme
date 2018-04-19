@@ -94,7 +94,7 @@ public class Question {
 	}
 
 	public QuestionDTO toDTO() {
-		return new QuestionDTO(id, questionString, answers);
+		return new QuestionDTO(id, questionString, answers, correctAnswer);
 	}
 
 }

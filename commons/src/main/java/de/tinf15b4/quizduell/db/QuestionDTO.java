@@ -11,10 +11,11 @@ public class QuestionDTO {
 	public QuestionDTO() {
 	}
 
-	public QuestionDTO(long id, String questionString, Set<Answer> answers) {
+	public QuestionDTO(long id, String questionString, Set<Answer> answers, Answer correctAnswer) {
 		this.id = id;
 		this.questionString = questionString;
 		this.answers = answers;
+		answers.add(correctAnswer);
 	}
 
 	public String getQuestionString() {
