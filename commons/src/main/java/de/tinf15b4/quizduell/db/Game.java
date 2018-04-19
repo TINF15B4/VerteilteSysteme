@@ -1,7 +1,6 @@
 package de.tinf15b4.quizduell.db;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -11,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Game {
@@ -18,8 +18,11 @@ public class Game {
 	@Id
 	private UUID gameId;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	private Set<PlayingUser> users;
+	@OneToOne(cascade = CascadeType.ALL)
+	private PlayingUser user1;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	private PlayingUser user2;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<Question> questions;
@@ -37,9 +40,10 @@ public class Game {
 	public Game() {
 		/* HIBERNATE COMPAT ONLY */ }
 
-	public Game(UUID gameId, Set<PlayingUser> users, List<Question> questions) {
+	public Game(UUID gameId, PlayingUser user1, PlayingUser user2, List<Question> questions) {
 		this.gameId = gameId;
-		this.users = users;
+		this.user1 = user1;
+		this.user2 = user2;
 		this.questions = questions;
 	}
 
@@ -47,8 +51,19 @@ public class Game {
 		return gameId;
 	}
 
-	public Set<PlayingUser> getUsers() {
-		return users;
+	public PlayingUser getUser1() {
+		return user1;
+	}
+
+	public PlayingUser getUser2() {
+		return user2;
+	}
+
+	public PlayingUser getCurrentPlayingUser() {
+		if (user1.getUser().getId() == currentUser.getId())
+			return user1;
+		else
+			return user2;
 	}
 
 	public List<Question> getQuestions() {
@@ -56,11 +71,19 @@ public class Game {
 	}
 
 	public Question getCurrentQuestion() {
-		return questions.get(currentQuestionIndex);
+		if (currentQuestionIndex > questions.size()) {
+			return null;
+		} else {
+			return questions.get(currentQuestionIndex);
+		}
 	}
 
 	public User getCurrentUser() {
 		return currentUser;
+	}
+
+	public void setCurrentUser(User currentUser) {
+		this.currentUser = currentUser;
 	}
 
 	public long getTimestamp() {
@@ -77,52 +100,30 @@ public class Game {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + currentQuestionIndex;
-		result = prime * result + ((currentUser == null) ? 0 : currentUser.hashCode());
-		result = prime * result + ((gameId == null) ? 0 : gameId.hashCode());
-		result = prime * result + ((questions == null) ? 0 : questions.hashCode());
-		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
-		result = prime * result + ((users == null) ? 0 : users.hashCode());
-		return result;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Game)) return false;
+
+		Game game = (Game) o;
+
+		if (currentQuestionIndex != game.currentQuestionIndex) return false;
+		if (timestamp != game.timestamp) return false;
+		if (gameId != null ? !gameId.equals(game.gameId) : game.gameId != null) return false;
+		if (user1 != null ? !user1.equals(game.user1) : game.user1 != null) return false;
+		if (user2 != null ? !user2.equals(game.user2) : game.user2 != null) return false;
+		if (questions != null ? !questions.equals(game.questions) : game.questions != null) return false;
+		return currentUser != null ? currentUser.equals(game.currentUser) : game.currentUser == null;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Game other = (Game) obj;
-		if (currentQuestionIndex != other.currentQuestionIndex)
-			return false;
-		if (currentUser == null) {
-			if (other.currentUser != null)
-				return false;
-		} else if (!currentUser.equals(other.currentUser))
-			return false;
-		if (gameId == null) {
-			if (other.gameId != null)
-				return false;
-		} else if (!gameId.equals(other.gameId))
-			return false;
-		if (questions == null) {
-			if (other.questions != null)
-				return false;
-		} else if (!questions.equals(other.questions))
-			return false;
-		if (timestamp != other.timestamp)
-			return false;
-		if (users == null) {
-			if (other.users != null)
-				return false;
-		} else if (!users.equals(other.users))
-			return false;
-		return true;
+	public int hashCode() {
+		int result = gameId != null ? gameId.hashCode() : 0;
+		result = 31 * result + (user1 != null ? user1.hashCode() : 0);
+		result = 31 * result + (user2 != null ? user2.hashCode() : 0);
+		result = 31 * result + (questions != null ? questions.hashCode() : 0);
+		result = 31 * result + currentQuestionIndex;
+		result = 31 * result + (currentUser != null ? currentUser.hashCode() : 0);
+		result = 31 * result + (int) (timestamp ^ (timestamp >>> 32));
+		return result;
 	}
-
 }

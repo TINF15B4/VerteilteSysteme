@@ -95,24 +95,23 @@ public class PersistenceBean {
 		return game;
 	}
 
-	public Question getRandomQuestion() {
+	public List<Question> getFiveRandomQuestions() {
 		Random rand = new Random();
 		EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
-		TypedQuery<Question> query = manager
-				.createQuery("SELECT x from " + "Question x WHERE id = " + rand.nextInt(1800), Question.class);
-		List<Question> list = query.getResultList();
-		manager.getTransaction().commit();
-		try {
-			return list.get(0);
-		} catch (Exception e) {
-			Answer A1 = new Answer("Ja!");
-			Answer A2 = new Answer("Nein!");
-			Answer A3 = new Answer("Vielleicht");
-			Answer A4 = new Answer("Ihr seit ja echt scheiße!");
-			return new Question("Ist uns ein Fehler unterlaufen?", Sets.newHashSet(A1, A2, A3, A4), A1);
+		TypedQuery<Integer> query = manager
+				.createQuery("SELECT count(*) FROM " + "Question", Integer.class);
 
-		}
+
+		List<Integer> list = query.getResultList();
+		manager.getTransaction().commit();
+
+		int randomNumber = rand.nextInt(list.get(0) - 5);
+
+		TypedQuery<Question> selectQuery = manager.createQuery("SELECT q FROM Question q", Question.class);
+		selectQuery.setFirstResult(randomNumber);
+		selectQuery.setMaxResults(5);
+		return selectQuery.getResultList();
 	}
 
 	public PendingGame findAndConsumePendingGame(User user) {
