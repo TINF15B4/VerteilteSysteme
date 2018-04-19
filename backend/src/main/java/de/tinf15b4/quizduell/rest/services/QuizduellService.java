@@ -1,9 +1,7 @@
 package de.tinf15b4.quizduell.rest.services;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -46,50 +44,70 @@ public class QuizduellService implements IQuizduellService {
 	@Path("/question/{gameId}/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public QuestionDTO getQuestion(@PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
-		Game game = persistenceBean.getGameWithId(gameId);
-		if (game.getCurrentUser().getId() == userId) {
-			// same user still, return same question
-			return game.getCurrentQuestion().toDTO();
-		} else {
-			// next question
-			Question question = game.nextQuestion();
+		Game game = persistenceBean.findById(Game.class, gameId);
+		if (game == null)
+			throw new WebApplicationException(Response.status(404).entity("Unknown Game").build());
+
+		if (game.getCurrentQuestion() == null)
+			throw new WebApplicationException(204);
+
+		if (game.getCurrentUser().getId() != userId)
+			throw new WebApplicationException(423);
+
+		if (game.getTimestamp() == -1) {
 			game.setTimestamp(System.currentTimeMillis());
-			persistenceBean.transaction().update(game).commit();
-			return question.toDTO();
+			game = persistenceBean.merge(game);
 		}
+
+		return game.getCurrentQuestion().toDTO();
 	}
 
 	@Override
 	@POST
 	@Path("/answer/{gameId}/{userId}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public boolean postAnswer(Answer answer, @PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
-		Game game = persistenceBean.getGameWithId(gameId);
-		for (PlayingUser playingUser : game.getUsers()) {
-			if (playingUser.getUser().getId() == userId) {
-				// We found the right user in the right game!
-				Question currentQuestion = game.getCurrentQuestion();
-				if (currentQuestion.getAnswers().contains(answer)) {
-					long diff = System.currentTimeMillis() - game.getTimestamp();
-					if (diff > ANSWER_TIMEOUT_MILLIS) {
-						throw new WebApplicationException(
-								Response.status(406).entity("Answer too late. Timeout has been reached").build());
-					}
-					if (currentQuestion.getCorrectAnswer().equals(answer)) {
-						playingUser.incrementPoints();
-						persistenceBean.transaction().update(playingUser).commit();
-						return true;
-					}
-				} else {
-					// recieved an Answer that does not match the answers of the question
-					LOGGER.error("Answer not in question's answer set");
-					throw new WebApplicationException(
-							Response.status(400).entity("Answer not in question's answer set").build());
-				}
-			}
+	public void postAnswer(Answer answer, @PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
+		Game game = persistenceBean.findById(Game.class, gameId);
+		if (game == null)
+			throw new WebApplicationException(Response.status(404).entity("Unknown Game").build());
+
+		if (game.getCurrentUser().getId() != userId)
+			throw new WebApplicationException(423);
+
+		Question answeredQuestion = game.getCurrentQuestion();
+		long answerTimestamp = game.getTimestamp();
+		if (answeredQuestion == null)
+			throw new WebApplicationException(Response.status(400).entity("Game finished").build());
+
+		if (game.getCurrentUser().getId() == game.getUser1().getUser().getId()) {
+			// user 1 --> switch to user 2
+			game.setCurrentUser(game.getUser2().getUser());
+		} else {
+			// user 2 --> switch to user 1 and advance question
+			game.setCurrentUser(game.getUser1().getUser());
+			game.nextQuestion();
 		}
-		return false;
+		game.setTimestamp(-1);
+		game = persistenceBean.merge(game);
+
+		// check validity and award points
+		if (answeredQuestion.getAnswers().contains(answer)) {
+			long diff = System.currentTimeMillis() - answerTimestamp;
+			if (diff > ANSWER_TIMEOUT_MILLIS) {
+				throw new WebApplicationException(
+						Response.status(406).entity("Answer too late. Timeout has been reached").build());
+			}
+			if (answeredQuestion.getCorrectAnswer().equals(answer)) {
+				game.getCurrentPlayingUser().incrementPoints();
+				persistenceBean.transaction().update(game.getCurrentPlayingUser()).commit();
+			} else {
+				throw new WebApplicationException(Response.status(406).entity("Answer was wrong").build());
+			}
+		} else {
+			// recieved an Answer that does not match the answers of the question
+			throw new WebApplicationException(
+					Response.status(400).entity("Answer not in question's answer set").build());
+		}
 	}
 
 	@Override
@@ -105,14 +123,16 @@ public class QuizduellService implements IQuizduellService {
 		PendingGame pg = persistenceBean.findAndConsumePendingGame(u);
 		if (pg != null) {
 			// create game
-			Set<PlayingUser> users = new HashSet<>();
-			users.add(new PlayingUser(u, 0));
-			users.add(new PlayingUser(pg.getWaitingUser(), 0));
 			List<Question> questionList = new ArrayList<>();
 			for (int i = 0; i < 5; ++i) {
 				questionList.add(persistenceBean.getRandomQuestion());
 			}
-			Game g = new Game(pg.getGameId(), users, questionList);
+			Game g = new Game(pg.getGameId(),
+					new PlayingUser(u, 0),
+					new PlayingUser(pg.getWaitingUser(), 0),
+					questionList);
+			g.setCurrentUser(u);
+			g.setTimestamp(-1);
 
 			persistenceBean.merge(g);
 			return g.getGameId();
@@ -134,13 +154,15 @@ public class QuizduellService implements IQuizduellService {
 		Game game = persistenceBean.getGameWithId(gameId);
 		int myPoints = -1;
 		int otherPoints = 0;
-		for (PlayingUser u : game.getUsers()) {
-			if (u.getUser().getId() == userId) {
-				myPoints = u.getPoints();
-			} else {
-				otherPoints = u.getPoints();
-			}
+
+		if (game.getUser1().getUser().getId() == userId) {
+			myPoints = game.getUser1().getPoints();
+			otherPoints = game.getUser2().getPoints();
+		} else if (game.getUser2().getId() == userId) {
+			myPoints = game.getUser2().getPoints();
+			otherPoints = game.getUser2().getPoints();
 		}
+
 		if (myPoints == -1)
 			throw new WebApplicationException(Response.status(400).entity("Invalid user id").build());
 		return new Points(myPoints, otherPoints);
