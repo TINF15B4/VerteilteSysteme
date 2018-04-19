@@ -18,7 +18,9 @@ public class GeneralExceptionMapper implements ExceptionMapper<Throwable> {
 	public Response toResponse(Throwable e) {
 		logger.error("", e);
 		if (e instanceof WebApplicationException) {
-			return ((WebApplicationException)e).getResponse();
+			Response.fromResponse(((WebApplicationException) e).getResponse()).header("content-type",
+					MediaType.TEXT_PLAIN);
+			return ((WebApplicationException) e).getResponse();
 		} else {
 			return Response.status(500)//
 					.entity("The server did something wrong. See server log for additional information")//
