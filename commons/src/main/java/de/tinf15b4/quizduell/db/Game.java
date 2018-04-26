@@ -9,8 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -25,7 +25,7 @@ public class Game {
 	@OneToOne(cascade = CascadeType.ALL)
 	private PlayingUser user2;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<Question> questions;
 
 	@Column
@@ -102,17 +102,25 @@ public class Game {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Game)) return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof Game))
+			return false;
 
 		Game game = (Game) o;
 
-		if (currentQuestionIndex != game.currentQuestionIndex) return false;
-		if (timestamp != game.timestamp) return false;
-		if (gameId != null ? !gameId.equals(game.gameId) : game.gameId != null) return false;
-		if (user1 != null ? !user1.equals(game.user1) : game.user1 != null) return false;
-		if (user2 != null ? !user2.equals(game.user2) : game.user2 != null) return false;
-		if (questions != null ? !questions.equals(game.questions) : game.questions != null) return false;
+		if (currentQuestionIndex != game.currentQuestionIndex)
+			return false;
+		if (timestamp != game.timestamp)
+			return false;
+		if (gameId != null ? !gameId.equals(game.gameId) : game.gameId != null)
+			return false;
+		if (user1 != null ? !user1.equals(game.user1) : game.user1 != null)
+			return false;
+		if (user2 != null ? !user2.equals(game.user2) : game.user2 != null)
+			return false;
+		if (questions != null ? !questions.equals(game.questions) : game.questions != null)
+			return false;
 		return currentUser != null ? currentUser.equals(game.currentUser) : game.currentUser == null;
 	}
 
