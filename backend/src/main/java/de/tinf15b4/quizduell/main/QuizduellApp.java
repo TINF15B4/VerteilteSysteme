@@ -2,6 +2,8 @@ package de.tinf15b4.quizduell.main;
 
 import java.net.URI;
 
+import javax.enterprise.inject.spi.CDI;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -52,10 +54,9 @@ public class QuizduellApp {
 		HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create(getUri()), rc);
 		System.setProperty("ihatestau.apiurl", getUri());
 
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			weld.shutdown();
-			server.shutdown();
-		}));
+		ShutdownController hook = CDI.current().select(ShutdownController.class).get();
+		hook.setServer(server);
+		hook.setWeld(weld);
 
 		return server;
 	}
