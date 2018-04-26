@@ -53,7 +53,8 @@ public class RestInterface {
 		WebResource questions = client.resource(
 				UriBuilder.fromUri(restServiceUrl).path("question").path("" + gameUUID).path("" + userID).build());
 		ClientResponse response = questions.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		HandleQuestion handleQuestion = new HandleQuestion(response.getEntity(QuestionDTO.class), response.getStatus());
+		HandleQuestion handleQuestion = new HandleQuestion(response);
+//				new HandleQuestion(response.getEntity(QuestionDTO.class), response.getStatus());
 		return handleQuestion;
 	}
 
