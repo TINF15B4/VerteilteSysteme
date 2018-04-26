@@ -39,9 +39,9 @@ public class Controller {
 		NameGenerator newName = new NameGenerator();
 		playerName = newName.getName();
 		lblPlayerName.setText("Hello " + playerName);
-
+		restInterface = new RestInterface("http://localhost:8080/quizduell/api/"); // TODO
 		try {
-			restInterface = new RestInterface("http://localhost:8080/quizduell/api/"); // TODO
+			restInterface.createUser(playerName);
 		} catch (Exception e) {
 			lblQuestion.setText(
 					"Es konnte keine Verbindung zum Server hergestellt werden. Bitte pruefen Sie ihre Internetverbindung und starten Sie die Anwendung neu.");
@@ -49,7 +49,6 @@ public class Controller {
 			setDisableAllAnswerButtons(true);
 			return;
 		}
-		restInterface.createUser(playerName);
 	}
 
 	@FXML
@@ -75,7 +74,7 @@ public class Controller {
 	@FXML
 	private void handleSubmit(int answer) {
 		boolean isCorrect = restInterface.postAnswer((Answer) this.answers[answer - 1]);
-		String output = "Your answer was " + (isCorrect ? "correct" : "wrong");
+		String output = "Your answer was " + (isCorrect ? "correct" : isTimerStarted ? "wrong" : "too late");
 		lblQuestion.setText(output);
 		btnStart.setDisable(false);
 		isClicked = true;
