@@ -98,13 +98,13 @@ public class PersistenceBean {
 
 		EntityManager em = factory.createEntityManager();
 		try {
+			em.getTransaction().begin();
 			TypedQuery<PendingGame> query = em.createQuery(
 					"SELECT x from PendingGame x WHERE x.waitingUser.id <> " + user.getId(), PendingGame.class);
 			query.setMaxResults(1);
 			List<PendingGame> queryResult = query.getResultList();
 			if (!queryResult.isEmpty()) {
 				game = queryResult.get(0);
-				em.getTransaction().begin();
 				em.remove(game);
 				em.getTransaction().commit();
 			}
