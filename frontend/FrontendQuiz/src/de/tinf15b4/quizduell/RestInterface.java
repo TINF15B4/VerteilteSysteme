@@ -35,7 +35,11 @@ public class RestInterface {
 	public boolean postAnswer(Answer answer) {
 		WebResource answers = client.resource(
 				UriBuilder.fromUri(restServiceUrl).path("answer").path("" + gameUUID).path("" + userID).build());
-		return answers.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(boolean.class, answer);
+		ClientResponse response = answers.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, answer);
+		if (response.getStatus() == 406) {
+			return false;
+		}
+		return true;
 	}
 
 	public void postReady() {

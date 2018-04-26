@@ -11,7 +11,7 @@ import javafx.scene.control.ProgressIndicator;
 public class Controller {
 
 	boolean isClicked = false;
-	boolean isStarted = false;
+	boolean isTimerStarted = false;
 	boolean gameRunning = false;
 	RestInterface restInterface;
 	private Object[] answers;
@@ -74,15 +74,13 @@ public class Controller {
 
 	@FXML
 	private void handleSubmit(int answer) {
-		if (isStarted) {
-			boolean isCorrect = restInterface.postAnswer((Answer) this.answers[answer - 1]);
-			String output = "Your answer was " + (isCorrect ? "correct" : "wrong");
-			lblQuestion.setText(output);
-			btnStart.setDisable(false);
-			isClicked = true;
-			isStarted = false;
-			setDisableAllAnswerButtons(true);
-		}
+		boolean isCorrect = restInterface.postAnswer((Answer) this.answers[answer - 1]);
+		String output = "Your answer was " + (isCorrect ? "correct" : "wrong");
+		lblQuestion.setText(output);
+		btnStart.setDisable(false);
+		isClicked = true;
+		isTimerStarted = false;
+		setDisableAllAnswerButtons(true);
 	}
 
 	private void setDisableAllAnswerButtons(boolean disable) {
@@ -130,7 +128,7 @@ public class Controller {
 
 		progressIndicator.setProgress(0.0);
 
-		isStarted = true;
+		isTimerStarted = true;
 
 		Thread progress = new Thread() {
 			public void run() {
@@ -143,7 +141,7 @@ public class Controller {
 						System.out.println(v);
 					}
 				}
-				isStarted = false;
+				isTimerStarted = false;
 			}
 		};
 		progress.start();
@@ -184,20 +182,20 @@ public class Controller {
 		btnAnswer3.setText("Vielleicht");
 		btnAnswer4.setText("Leck mich");
 
-		isStarted = true;
+		isTimerStarted = true;
 
 		Thread progress = new Thread() {
 			public void run() {
 				while (progressIndicator.getProgress() <= 1 && !isClicked) {
 					try {
 						progressIndicator.setProgress(progressIndicator.getProgress() + 0.1);
-						Thread.sleep(1000);
+						Thread.sleep(2000);
 
 					} catch (InterruptedException v) {
 						System.out.println(v);
 					}
 				}
-				isStarted = false;
+				isTimerStarted = false;
 			}
 		};
 		progress.start();
