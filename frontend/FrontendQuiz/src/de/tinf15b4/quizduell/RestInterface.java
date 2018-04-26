@@ -3,15 +3,19 @@ package de.tinf15b4.quizduell;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.tinf15b4.quizduell.db.Answer;
 import de.tinf15b4.quizduell.db.Points;
 import de.tinf15b4.quizduell.db.Question;
 import de.tinf15b4.quizduell.db.QuestionDTO;
 
+import java.net.URI;
 import java.util.UUID;
 
 public class RestInterface {
@@ -24,8 +28,9 @@ public class RestInterface {
 
 	public RestInterface(String restServiceUrl) {
 		this.restServiceUrl = restServiceUrl;
-		client = Client.create();
-	}
+		ClientConfig cc = new DefaultClientConfig();
+		cc.getClasses().add(JacksonJsonProvider.class);
+		this.client = Client.create(cc);	}
 
 	public boolean postAnswer(Answer answer) {
 		WebResource answers = client.resource(
@@ -39,7 +44,8 @@ public class RestInterface {
 	}
 
 	public void createUser(String username) {
-		WebResource user = client.resource(UriBuilder.fromUri(restServiceUrl).path("user").build());
+		URI uri = UriBuilder.fromUri(restServiceUrl).path("user").build();
+		WebResource user = client.resource(uri);
 		userID = Long.valueOf(user.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).post(String.class, username));
 	}
 
