@@ -72,7 +72,7 @@ public class Game {
 	}
 
 	public Question getCurrentQuestion() {
-		if (currentQuestionIndex > questions.size()) {
+		if (currentQuestionIndex >= questions.size()) {
 			return null;
 		} else {
 			return questions.get(currentQuestionIndex);
