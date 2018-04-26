@@ -75,8 +75,10 @@ public class QuizduellService implements IQuizduellService {
 		checkPreconditions(userId, game);
 
 		long timestamp = game.getTimestamp();
+		Question question = game.getCurrentQuestion();
+
 		updateUsersAndTimestamp(game);
-		if (checkAnswer(answer, game, timestamp)) {
+		if (checkAnswer(question, answer, game, timestamp)) {
 			LOGGER.info("Correct answer");
 			game.getCurrentPlayingUser().incrementPoints();
 			persistenceBean.transaction().update(game.getCurrentPlayingUser()).commit();
@@ -97,21 +99,31 @@ public class QuizduellService implements IQuizduellService {
 		persistenceBean.transaction().update(game).commit();
 	}
 
-	private boolean checkAnswer(Answer answer, Game game, long timestamp) {
+	private boolean checkAnswer(Question answeredQuestion, Answer answer, Game game, long timestamp) {
 		if (System.currentTimeMillis() - timestamp > ANSWER_TIMEOUT_MILLIS) {
 			LOGGER.info("Timeout reached");
 			throw new WebApplicationException(
 					Response.status(406).entity("Answer too late. Timeout has been reached").build());
 		}
 
-		Question answeredQuestion = game.getCurrentQuestion();
 		if (answeredQuestion.getCorrectAnswer().equals(answer))
 			return true;
 		if (!answeredQuestion.getAnswers().contains(answer)) {
-			LOGGER.info("Wrong answer");
+			LOGGER.info("Wrong answer - answer not in answer set");
+			LOGGER.info("In Answer set:");
+			for (Answer a : answeredQuestion.getAnswers()) {
+				LOGGER.info("    - " + a.getId() + ": " + a.getAnswerString());
+			}
+			LOGGER.info("given: " + answer.getId() + ": " + answer.getAnswerString());
+			LOGGER.info("correct: " + answeredQuestion.getCorrectAnswer().getId()
+					+ ": " + answeredQuestion.getCorrectAnswer().getAnswerString());
 			throw new WebApplicationException(
 					Response.status(400).entity("Answer not in question's answer set").build());
 		}
+
+		LOGGER.info("Wrong answer - Correct would have been "
+				+ answeredQuestion.getCorrectAnswer().getId() + ": "
+				+ answeredQuestion.getCorrectAnswer().getAnswerString());
 		throw new WebApplicationException(Response.status(406).entity("Answer was wrong").build());
 	}
 
