@@ -28,7 +28,6 @@ public class Transaction {
 
 	public void commit() {
 		manager.getTransaction().commit();
-		manager.close();
 	}
 
 }

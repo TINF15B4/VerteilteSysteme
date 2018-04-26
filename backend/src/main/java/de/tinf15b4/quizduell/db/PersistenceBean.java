@@ -1,19 +1,14 @@
 package de.tinf15b4.quizduell.db;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
-
-import de.tinf15b4.quizduell.main.ShutdownController;
 
 /**
  * Use this classes methods for read operations only. Move everything else to
@@ -21,82 +16,53 @@ import de.tinf15b4.quizduell.main.ShutdownController;
  * transaction.
  */
 
-@Singleton
+@RequestScoped
 public class PersistenceBean {
-
 	@Inject
-	private ShutdownController shutdown;
+	private EntityManagerFactoryBean emf;
 
-	private EntityManagerFactory factory;
-
-	public PersistenceBean() {
-		String persistenceUnit = System.getenv("DB_UNIT");
-		if (persistenceUnit == null || persistenceUnit.length() == 0)
-			persistenceUnit = "testing";
-
-		Map<String, String> overrides = new HashMap<>();
-
-		if (System.getenv("DB_URL") != null)
-			overrides.put("hibernate.connection.url", System.getenv("DB_URL"));
-		if (System.getenv("DB_USERNAME") != null)
-			overrides.put("hibernate.connection.username", System.getenv("DB_USERNAME"));
-		if (System.getenv("DB_PASSWORD") != null)
-			overrides.put("hibernate.connection.password", System.getenv("DB_PASSWORD"));
-
-		factory = Persistence.createEntityManagerFactory(persistenceUnit, overrides);
-	}
+	private EntityManager em;
 
 	@PostConstruct
-	public void postInit() {
-		shutdown.setDb(factory);
+	private void postInit() {
+		em = emf.createEntityManager();
+	}
+
+	@PreDestroy
+	private void cleanup() {
+		em.close();
 	}
 
 	public Transaction transaction() {
-		return new Transaction(factory.createEntityManager());
+		return new Transaction(em);
 	}
 
 	public <T> List<T> findAll(Class<T> clazz) {
-		EntityManager manager = factory.createEntityManager();
-		try {
-			TypedQuery<T> query = manager.createQuery("SELECT x from " + clazz.getName() + " x", clazz);
-			return query.getResultList();
-		} finally {
-			manager.close();
-		}
+		TypedQuery<T> query = em.createQuery("SELECT x from " + clazz.getName() + " x", clazz);
+		return query.getResultList();
 	}
 
 	public <T> T findById(Class<T> clazz, Object id) {
-		EntityManager manager = factory.createEntityManager();
-		try {
-			return manager.find(clazz, id);
-		} finally {
-			manager.close();
-		}
+		return em.find(clazz, id);
 	}
 
 	public Question getRandomQuestion() {
 		Random rand = new Random();
-		EntityManager manager = factory.createEntityManager();
-		try {
-			TypedQuery<Long> query = manager.createQuery("SELECT count(*) FROM Question", Long.class);
+		TypedQuery<Long> query = em.createQuery("SELECT count(*) FROM Question", Long.class);
 
-			Long count = query.getSingleResult();
-			int randomNumber = rand.nextInt(Math.toIntExact(count));
+		Long count = query.getSingleResult();
+		int randomNumber = rand.nextInt(Math.toIntExact(count));
 
-			TypedQuery<Question> selectQuery = manager.createQuery("SELECT q FROM Question q", Question.class);
-			selectQuery.setFirstResult(randomNumber);
-			selectQuery.setMaxResults(1);
-			List<Question> resultList = selectQuery.getResultList();
-			return resultList.get(0);
-		} finally {
-			manager.close();
-		}
+		TypedQuery<Question> selectQuery = em.createQuery("SELECT q FROM Question q", Question.class);
+		selectQuery.setFirstResult(randomNumber);
+		selectQuery.setMaxResults(1);
+		List<Question> resultList = selectQuery.getResultList();
+		return resultList.get(0);
 	}
 
 	public PendingGame findAndConsumePendingGame(User user) {
 		PendingGame game = null;
 
-		EntityManager em = factory.createEntityManager();
 		try {
 			em.getTransaction().begin();
 			TypedQuery<PendingGame> query = em.createQuery(
@@ -106,11 +72,15 @@ public class PersistenceBean {
 			if (!queryResult.isEmpty()) {
 				game = queryResult.get(0);
 				em.remove(game);
-				em.getTransaction().commit();
 			}
+
+			em.getTransaction().commit();
 			return game;
-		} finally {
-			em.close();
+		} catch (Throwable t) {
+			if (em.getTransaction().isActive())
+				em.getTransaction().rollback();
+
+			throw t;
 		}
 	}
 
