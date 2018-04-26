@@ -74,8 +74,9 @@ public class QuizduellService implements IQuizduellService {
 		Game game = persistenceBean.findById(Game.class, gameId);
 		checkPreconditions(userId, game);
 
+		long timestamp = game.getTimestamp();
 		updateUsersAndTimestamp(game);
-		if (checkAnswer(answer, game)) {
+		if (checkAnswer(answer, game, timestamp)) {
 			LOGGER.info("Correct answer");
 			game.getCurrentPlayingUser().incrementPoints();
 			persistenceBean.transaction().update(game.getCurrentPlayingUser()).commit();
@@ -96,8 +97,8 @@ public class QuizduellService implements IQuizduellService {
 		persistenceBean.transaction().update(game).commit();
 	}
 
-	private boolean checkAnswer(Answer answer, Game game) {
-		if (System.currentTimeMillis() - game.getTimestamp() > ANSWER_TIMEOUT_MILLIS) {
+	private boolean checkAnswer(Answer answer, Game game, long timestamp) {
+		if (System.currentTimeMillis() - timestamp > ANSWER_TIMEOUT_MILLIS) {
 			LOGGER.info("Timeout reached");
 			throw new WebApplicationException(
 					Response.status(406).entity("Answer too late. Timeout has been reached").build());
