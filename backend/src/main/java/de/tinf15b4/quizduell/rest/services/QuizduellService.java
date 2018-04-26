@@ -15,6 +15,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.tinf15b4.quizduell.db.Answer;
 import de.tinf15b4.quizduell.db.Game;
 import de.tinf15b4.quizduell.db.PendingGame;
@@ -30,6 +33,7 @@ import de.tinf15b4.quizduell.rest.api.IQuizduellService;
 public class QuizduellService implements IQuizduellService {
 
 	private static final int ANSWER_TIMEOUT_MILLIS = 20000;
+	private static final Logger LOGGER = LoggerFactory.getLogger(QuizduellService.class);
 
 	@Inject
 	private PersistenceBean persistenceBean;
@@ -43,10 +47,11 @@ public class QuizduellService implements IQuizduellService {
 		checkPreconditions(userId, game);
 
 		if (game.getTimestamp() == -1) {
+			LOGGER.info("Starting timer");
 			game.setTimestamp(System.currentTimeMillis());
 			persistenceBean.transaction().update(game).commit();
 		}
-
+		LOGGER.info("Returning current question");
 		return game.getCurrentQuestion().toDTO();
 	}
 
@@ -71,12 +76,13 @@ public class QuizduellService implements IQuizduellService {
 
 		updateUsersAndTimestamp(game);
 		if (checkAnswer(answer, game)) {
+			LOGGER.info("Correct answer");
 			game.getCurrentPlayingUser().incrementPoints();
 			persistenceBean.transaction().update(game.getCurrentPlayingUser()).commit();
 		}
 
 	}
-	
+
 	private void updateUsersAndTimestamp(Game game) {
 		if (game.getCurrentUser().getId() == game.getUser1().getUser().getId()) {
 			// user 1 --> switch to user 2
@@ -92,6 +98,7 @@ public class QuizduellService implements IQuizduellService {
 
 	private boolean checkAnswer(Answer answer, Game game) {
 		if (System.currentTimeMillis() - game.getTimestamp() > ANSWER_TIMEOUT_MILLIS) {
+			LOGGER.info("Timeout reached");
 			throw new WebApplicationException(
 					Response.status(406).entity("Answer too late. Timeout has been reached").build());
 		}
@@ -100,6 +107,7 @@ public class QuizduellService implements IQuizduellService {
 		if (answeredQuestion.getCorrectAnswer().equals(answer))
 			return true;
 		if (!answeredQuestion.getAnswers().contains(answer)) {
+			LOGGER.info("Wrong answer");
 			throw new WebApplicationException(
 					Response.status(400).entity("Answer not in question's answer set").build());
 		}
@@ -118,13 +126,14 @@ public class QuizduellService implements IQuizduellService {
 
 		PendingGame pendingGame = persistenceBean.findAndConsumePendingGame(user);
 		if (pendingGame != null) {
+			LOGGER.info("Starting game");
 			// create game
 			List<Question> questionList = new ArrayList<>();
 			for (int i = 0; i < 5; i++) {
 				questionList.add(persistenceBean.getRandomQuestion());
 			}
-			Game game = new Game(pendingGame.getGameId(), new PlayingUser(user, 0), new PlayingUser(pendingGame.getWaitingUser(), 0),
-					questionList);
+			Game game = new Game(pendingGame.getGameId(), new PlayingUser(user, 0),
+					new PlayingUser(pendingGame.getWaitingUser(), 0), questionList);
 			game.setCurrentUser(user);
 			game.setTimestamp(-1);
 
@@ -132,7 +141,7 @@ public class QuizduellService implements IQuizduellService {
 			return game.getGameId();
 		} else {
 			// create new pending game
-
+			LOGGER.info("Game pending");
 			pendingGame = new PendingGame(user);
 			persistenceBean.transaction().update(pendingGame).commit();
 
