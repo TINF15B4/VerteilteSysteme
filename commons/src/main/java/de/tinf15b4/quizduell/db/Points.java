@@ -5,6 +5,8 @@ public class Points {
 	private int myPoints;
 	private int otherPoints;
 
+	public Points() { /* JSON ONLY */ }
+
 	public Points(int myPoints, int otherPoints) {
 		this.myPoints = myPoints;
 		this.otherPoints = otherPoints;
