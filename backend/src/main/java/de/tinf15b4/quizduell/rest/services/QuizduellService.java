@@ -27,6 +27,7 @@ import de.tinf15b4.quizduell.db.Points;
 import de.tinf15b4.quizduell.db.Question;
 import de.tinf15b4.quizduell.db.QuestionDTO;
 import de.tinf15b4.quizduell.db.User;
+import de.tinf15b4.quizduell.rest.api.AnswerEvaluationResult;
 import de.tinf15b4.quizduell.rest.api.IQuizduellService;
 
 @Path("/api")
@@ -70,7 +71,8 @@ public class QuizduellService implements IQuizduellService {
 	@POST
 	@Path("/answer/{gameId}/{userId}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void postAnswer(Answer answer, @PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public AnswerEvaluationResult postAnswer(Answer answer, @PathParam("gameId") UUID gameId, @PathParam("userId") long userId) {
 		Game game = persistenceBean.findById(Game.class, gameId);
 		checkPreconditions(userId, game);
 
@@ -85,6 +87,7 @@ public class QuizduellService implements IQuizduellService {
 			persistenceBean.transaction().update(playingUser).commit();
 		}
 
+		return new AnswerEvaluationResult(AnswerEvaluationResult.Reason.CORRECT, question.getCorrectAnswer());
 	}
 
 	private void updateUsersAndTimestamp(Game game) {
@@ -104,7 +107,9 @@ public class QuizduellService implements IQuizduellService {
 		if (System.currentTimeMillis() - timestamp > ANSWER_TIMEOUT_MILLIS) {
 			LOGGER.info("Timeout reached");
 			throw new WebApplicationException(
-					Response.status(406).entity("Answer too late. Timeout has been reached").build());
+					Response.status(406).entity(
+							new AnswerEvaluationResult(AnswerEvaluationResult.Reason.TIMEOUT,
+									answeredQuestion.getCorrectAnswer())).build());
 		}
 
 		if (answeredQuestion.getCorrectAnswer().equals(answer))
@@ -119,13 +124,17 @@ public class QuizduellService implements IQuizduellService {
 			LOGGER.info("correct: " + answeredQuestion.getCorrectAnswer().getId()
 					+ ": " + answeredQuestion.getCorrectAnswer().getAnswerString());
 			throw new WebApplicationException(
-					Response.status(400).entity("Answer not in question's answer set").build());
+					Response.status(400).entity(
+							new AnswerEvaluationResult(AnswerEvaluationResult.Reason.WRONG,
+									answeredQuestion.getCorrectAnswer())).build());
 		}
 
 		LOGGER.info("Wrong answer - Correct would have been "
 				+ answeredQuestion.getCorrectAnswer().getId() + ": "
 				+ answeredQuestion.getCorrectAnswer().getAnswerString());
-		throw new WebApplicationException(Response.status(406).entity("Answer was wrong").build());
+		throw new WebApplicationException(Response.status(406).entity(
+				new AnswerEvaluationResult(AnswerEvaluationResult.Reason.WRONG,
+						answeredQuestion.getCorrectAnswer())).build());
 	}
 
 	@Override

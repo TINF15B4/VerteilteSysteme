@@ -10,7 +10,7 @@ public interface IQuizduellService {
 
 	QuestionDTO getQuestion(UUID gameId, long userId);
 
-	void postAnswer(Answer answer, UUID gameId, long userId);
+	AnswerEvaluationResult postAnswer(Answer answer, UUID gameId, long userId);
 
 	UUID ready(long userid);
 
