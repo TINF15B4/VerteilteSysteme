@@ -9,12 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 
 public class Controller {
-
-	boolean isClicked = false;
 	boolean isTimerStarted = false;
 	boolean gameRunning = false;
 	RestInterface restInterface;
 	private Object[] answers;
+	private Thread progressThread;
 
 	String playerName = "";
 
@@ -76,8 +75,9 @@ public class Controller {
 		String output = "Your answer was " + (isCorrect ? "correct" : isTimerStarted ? "wrong" : "too late");
 		lblQuestion.setText(output);
 		btnStart.setDisable(false);
-		isClicked = true;
 		isTimerStarted = false;
+		if (progressThread != null)
+			progressThread.interrupt();
 		setDisableAllAnswerButtons(true);
 	}
 
@@ -113,7 +113,6 @@ public class Controller {
 			return;
 		} else if (handleQuestion.statuscode == 404) {
 			lblQuestion.setText("Noch kein Mitspieler gefunden!");
-			btnStart.setText("Nochmal versuchen");
 			return;
 		}
 
@@ -127,25 +126,26 @@ public class Controller {
 		btnAnswer4.setText(((Answer) answers[3]).getAnswerString());
 		setDisableAllAnswerButtons(false);
 
-		progressIndicator.setProgress(0.0);
+		if (progressThread != null)
+			progressThread.interrupt();
 
-		isTimerStarted = true;
-
-		Thread progress = new Thread() {
+		progressThread = new Thread() {
 			public void run() {
-				while (progressIndicator.getProgress() <= 1 && !isClicked) {
+				progressIndicator.setProgress(0.0);
+				while (progressIndicator.getProgress() <= 1) {
 					try {
-						progressIndicator.setProgress(progressIndicator.getProgress() + 0.1);
+						progressIndicator.setProgress(progressIndicator.getProgress() + 0.05);
 						Thread.sleep(1000);
 
 					} catch (InterruptedException v) {
-						System.out.println(v);
+						return;
 					}
 				}
 				isTimerStarted = false;
 			}
 		};
-		progress.start();
+		isTimerStarted = true;
+		progressThread.start();
 
 		btnStart.setDisable(true);
 		// btnStart.setText("Next Question");
@@ -187,13 +187,13 @@ public class Controller {
 
 		Thread progress = new Thread() {
 			public void run() {
-				while (progressIndicator.getProgress() <= 1 && !isClicked) {
+				while (progressIndicator.getProgress() <= 1) {
 					try {
 						progressIndicator.setProgress(progressIndicator.getProgress() + 0.1);
 						Thread.sleep(2000);
 
 					} catch (InterruptedException v) {
-						System.out.println(v);
+						return;
 					}
 				}
 				isTimerStarted = false;
