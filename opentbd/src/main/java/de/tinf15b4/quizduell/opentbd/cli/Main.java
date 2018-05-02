@@ -21,7 +21,7 @@ public class Main {
 		OpenBtdBrowser openBtdBrowser = new OpenBtdBrowser(new OpenBtdRequests());
 		System.out.println("Token: " + openBtdBrowser.getToken());
 
-		List<OpenBtdQuestion> questions = openBtdBrowser.requestQuestions(2000);
+		List<OpenBtdQuestion> questions = openBtdBrowser.requestQuestions(200);
 
 		EntityManagerFactory factory = Persistence.createEntityManagerFactory("testing");
 		EntityManager entityManager = factory.createEntityManager();
@@ -38,6 +38,7 @@ public class Main {
 			Question question = new Question(q.getQuestion(), incorrect_answers, correct_answer);
 			entityManager.persist(question);
 
+			System.out.printf("Question %s%n", question.getQuestionString());
 		}
 
 		entityManager.getTransaction().commit();
