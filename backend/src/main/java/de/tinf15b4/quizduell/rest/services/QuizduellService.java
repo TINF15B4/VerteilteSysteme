@@ -174,7 +174,7 @@ public class QuizduellService implements IQuizduellService {
 		if (game.getUser1().getUser().getId() == userId) {
 			myPoints = game.getUser1().getPoints();
 			otherPoints = game.getUser2().getPoints();
-		} else if (game.getUser2().getId() == userId) {
+		} else if (game.getUser2().getUser().getId() == userId) {
 			myPoints = game.getUser2().getPoints();
 			otherPoints = game.getUser1().getPoints();
 		}
