@@ -37,7 +37,7 @@ public class QuestionInitializer {
             OpenBtdBrowser openBtdBrowser = new OpenBtdBrowser(new OpenBtdRequests());
             LOG.info("OpenTBDingens Token: " + openBtdBrowser.getToken());
 
-            List<OpenBtdQuestion> questions = openBtdBrowser.requestQuestions(200);
+            List<OpenBtdQuestion> questions = openBtdBrowser.requestQuestions(2000);
 
             for (OpenBtdQuestion q : questions) {
 
