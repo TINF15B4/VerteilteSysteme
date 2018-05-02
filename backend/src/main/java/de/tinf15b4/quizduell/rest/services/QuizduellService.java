@@ -59,11 +59,11 @@ public class QuizduellService implements IQuizduellService {
 		if (game == null)
 			throw new WebApplicationException(Response.status(404).entity("Unknown Game").build());
 
-		if (game.getCurrentUser().getId() != userId)
-			throw new WebApplicationException(Response.status(423).entity("It is the other user's turn").build());
-
 		if (game.getCurrentQuestion() == null)
 			throw new WebApplicationException(Response.status(204).entity("Game is finished").build());
+
+		if (game.getCurrentUser().getId() != userId)
+			throw new WebApplicationException(Response.status(423).entity("It is the other user's turn").build());
 	}
 
 	@Override
