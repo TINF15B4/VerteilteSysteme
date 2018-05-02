@@ -76,12 +76,13 @@ public class QuizduellService implements IQuizduellService {
 
 		long timestamp = game.getTimestamp();
 		Question question = game.getCurrentQuestion();
+		PlayingUser playingUser = game.getCurrentPlayingUser();
 
 		updateUsersAndTimestamp(game);
 		if (checkAnswer(question, answer, game, timestamp)) {
 			LOGGER.info("Correct answer");
-			game.getCurrentPlayingUser().incrementPoints();
-			persistenceBean.transaction().update(game.getCurrentPlayingUser()).commit();
+			playingUser.incrementPoints();
+			persistenceBean.transaction().update(playingUser).commit();
 		}
 
 	}
