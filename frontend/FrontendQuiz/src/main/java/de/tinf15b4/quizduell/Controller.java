@@ -40,14 +40,13 @@ public class Controller {
 		playerName = newName.getName();
 		lblPlayerName.setText("Hello " + playerName);
 		restInterface = new RestInterface("http://localhost:8080/quizduell/api/"); // TODO
+		setDisableAllAnswerButtons(true);
 		try {
 			restInterface.createUser(playerName);
 		} catch (Exception e) {
 			lblQuestion.setText(
 					"Es konnte keine Verbindung zum Server hergestellt werden. Bitte pruefen Sie ihre Internetverbindung und starten Sie die Anwendung neu.");
 			btnStart.setDisable(true);
-			setDisableAllAnswerButtons(true);
-			return;
 		}
 	}
 
@@ -96,6 +95,8 @@ public class Controller {
 		} else {
 			gameRunning = true;
 			restInterface.postReady();
+			lblQuestion.setText("Spiel erstellt!");
+			System.err.println("DEBUG: Spiel-ID " + restInterface.getGameUUID());
 			btnStart.setText("next question");
 		}
 	}
@@ -111,7 +112,8 @@ public class Controller {
 			selectWinner();
 			return;
 		} else if (handleQuestion.statuscode == 404) {
-			lblQuestion.setText("Das Spiel konnte nicht gefunden werden!");
+			lblQuestion.setText("Noch kein Mitspieler gefunden!");
+			btnStart.setText("Nochmal versuchen");
 			return;
 		}
 

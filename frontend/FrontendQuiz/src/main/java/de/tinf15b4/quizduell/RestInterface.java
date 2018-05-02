@@ -1,5 +1,8 @@
 package de.tinf15b4.quizduell;
 
+import java.net.URI;
+import java.util.UUID;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -12,11 +15,6 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import de.tinf15b4.quizduell.db.Answer;
 import de.tinf15b4.quizduell.db.Points;
-import de.tinf15b4.quizduell.db.Question;
-import de.tinf15b4.quizduell.db.QuestionDTO;
-
-import java.net.URI;
-import java.util.UUID;
 
 public class RestInterface {
 
@@ -66,5 +64,9 @@ public class RestInterface {
 		WebResource points = client.resource(
 				UriBuilder.fromUri(restServiceUrl).path("points").path("" + gameUUID).path("" + userID).build());
 		return points.accept(MediaType.APPLICATION_JSON).get(Points.class);
+	}
+
+	public UUID getGameUUID() {
+		return gameUUID;
 	}
 }
