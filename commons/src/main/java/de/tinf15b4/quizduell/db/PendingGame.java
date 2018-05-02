@@ -1,5 +1,7 @@
 package de.tinf15b4.quizduell.db;
 
+import org.hibernate.annotations.Type;
+
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -11,6 +13,7 @@ import javax.persistence.ManyToOne;
 public class PendingGame {
 
 	@Id
+	@Type(type="uuid-char")
 	private UUID gameId;
 
 	@ManyToOne

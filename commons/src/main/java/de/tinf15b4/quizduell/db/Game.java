@@ -1,5 +1,7 @@
 package de.tinf15b4.quizduell.db;
 
+import org.hibernate.annotations.Type;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +18,7 @@ import javax.persistence.OneToOne;
 public class Game {
 
 	@Id
+	@Type(type="uuid-char")
 	private UUID gameId;
 
 	@OneToOne(cascade = CascadeType.ALL)
