@@ -43,7 +43,7 @@ public class QuizduellApp {
 	 * 
 	 * @return Grizzly HTTP server.
 	 */
-	public HttpServer startServer() {
+	public HttpServer startServer() throws Exception {
 		final ResourceConfig rc = new ResourceConfig()//
 				.packages("de.tinf15b4.quizduell.rest.services", "de.tinf15b4.quizduell.rest.exceptions")//
 				.register(JacksonFeature.class);
@@ -58,6 +58,8 @@ public class QuizduellApp {
 		hook.setServer(server);
 		hook.setWeld(weld);
 
+		CDI.current().select(QuestionInitializer.class).get().maybeInitializeQuestions();
+
 		return server;
 	}
 
@@ -65,7 +67,7 @@ public class QuizduellApp {
 		return String.format("%s:%s%s", host, port, baseUrl);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		QuizduellApp app = new QuizduellApp();
 		JCommander commander = JCommander.newBuilder()//
 				.addObject(app)//
