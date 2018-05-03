@@ -38,7 +38,7 @@ public class Controller {
 		NameGenerator newName = new NameGenerator();
 		playerName = newName.getName();
 		lblPlayerName.setText("Hello " + playerName);
-		restInterface = new RestInterface("http://localhost:8080/quizduell/api/"); // TODO
+		restInterface = new RestInterface("http://18.221.91.246/quizduell/api/"); // TODO
 		setDisableAllAnswerButtons(true);
 		try {
 			restInterface.createUser(playerName);
